@@ -26,7 +26,7 @@ public class Player : MonoBehaviour {
     private float phiDot = 0.5f;
     private float thetaDdot = 0;
     private float phiDdot = 0;
-    private float epsilon = 0.0001f;
+    private float epsilon = 0.01f;
     public Vector3 angularVelocity;
 
     private void Awake() {
@@ -65,8 +65,7 @@ public class Player : MonoBehaviour {
         }
         if (Mathf.Abs(theta) < epsilon || 180 - Mathf.Abs(theta) < epsilon) { phiDdot = -(damping * phiDot); }
         else {
-            if (theta < epsilon) { theta = epsilon; }
-            phiDdot = -(2 * thetaDot * phiDot) / Mathf.Tan(theta) - (damping * phiDot);
+            phiDdot = -(2 * thetaDot * phiDot) / Mathf.Tan(Mathf.Max(theta, epsilon)) - (damping * phiDot);
         }
 
 
