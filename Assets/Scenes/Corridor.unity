@@ -657,6 +657,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mass: 100
   gravity: 9.81
+  damping: 0.1
   Anchor: {fileID: 972973545}
 --- !u!114 &873126565
 MonoBehaviour:
