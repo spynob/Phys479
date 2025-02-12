@@ -22,17 +22,12 @@ public class Player : MonoBehaviour {
     // Pendulum stuff
     private float theta; // Polar angle
     private float phi; // Azimuthal angle
-    private float thetaDot = 0;
-    private float phiDot = 0.5f;
+    private float omega = 0;
+    private float alpha = 0.5f;
     private float thetaDdot = 0;
     private float phiDdot = 0;
-    private float epsilon = 0.0001f;
-    public Vector3 angularVelocity;
-    private Quaternion orientationPendulum;
-
-    private float omega = 0; // Theta (angle) and omega (angular velocity)
-    private float alpha = 0;   // Phi (azimuthal) and alpha (angular velocity)
-
+    private float epsilon = 0.001f;
+    private float epsilonLength = 0.1f;
 
     private void Awake() {
         GetInput = GetComponent<InputSubscription>();
@@ -56,17 +51,9 @@ public class Player : MonoBehaviour {
     private void Grapple() {
         Vector3 relativePos = transform.position - Anchor.transform.position;
         length = relativePos.magnitude;
-        orientationPendulum = Quaternion.FromToRotation(Vector3.down, relativePos);
-        if (length < epsilon) { theta = 0; phi = 0; return; }
+        if (length < epsilonLength) { theta = 0; phi = 0; return; }
         theta = Mathf.Acos(relativePos.y / length);
         phi = Mathf.Atan2(relativePos.z, relativePos.x);
-    }
-
-    private Vector3 TorqueGravity(Quaternion q) {
-        Vector3 up = q * Vector3.up;
-        Vector3 gravityForce = -gravity * up;
-
-        return Vector3.Cross(up, gravityForce) / length;
     }
 
     void FixedUpdate() {
@@ -77,56 +64,6 @@ public class Player : MonoBehaviour {
         omega = state[1];
         phi = state[2];
         alpha = state[3];
-        /*
-        //Vector3 relativePos = transform.position - Anchor.transform.position;
-
-        float dt = Time.fixedDeltaTime;
-
-        // Apply RK4 integration
-        Debug.Log(orientationPendulum);
-        (Quaternion newRotation, Vector3 newAngularVelocity) = RK4Step(orientationPendulum, angularVelocity, dt);
-        orientationPendulum = newRotation;
-        angularVelocity = newAngularVelocity;
-        Debug.Log(angularVelocity);
-        transform.position = Anchor.transform.position + orientationPendulum * (Vector3.down * length);*/
-
-        /*
-                Vector3 torque = Vector3.Cross(relativePos, Vector3.down * gravity) - damping * angularVel;
-
-                angularVel += torque * Time.fixedDeltaTime;
-
-                Quaternion deltaRotation = new Quaternion(0, angularVel.x, angularVel.y, angularVel.z) * rotation;
-
-                rotation.w += 0.5f * deltaRotation.w * Time.fixedDeltaTime;
-                rotation.x += 0.5f * deltaRotation.x * Time.fixedDeltaTime;
-                rotation.y += 0.5f * deltaRotation.y * Time.fixedDeltaTime;
-                rotation.z += 0.5f * deltaRotation.z * Time.fixedDeltaTime;*/
-    }
-
-    private (Quaternion, Vector3) RK4Step(Quaternion q, Vector3 w, float dt) {
-        (Vector3 k1_w, Quaternion k1_q) = Derivatives(q, w);
-        (Vector3 k2_w, Quaternion k2_q) = Derivatives(q * ScaleQuaternion(k1_q, 0.5f * dt), w + 0.5f * dt * k1_w);
-        (Vector3 k3_w, Quaternion k3_q) = Derivatives(q * ScaleQuaternion(k2_q, 0.5f * dt), w + 0.5f * dt * k2_w);
-        (Vector3 k4_w, Quaternion k4_q) = Derivatives(q * ScaleQuaternion(k3_q, dt), w + dt * k3_w);
-
-        Vector3 newAngularVelocity = w + dt / 6.0f * (k1_w + 2 * k2_w + 2 * k3_w + k4_w);
-        Quaternion delta_q = ScaleQuaternion(k1_q * ScaleQuaternion(k2_q, 2) * ScaleQuaternion(k3_q, 2) * k4_q, dt / 6.0f);
-
-        Quaternion newRotation = q * delta_q;
-
-        return (Quaternion.Normalize(newRotation), newAngularVelocity);
-    }
-
-    private (Vector3, Quaternion) Derivatives(Quaternion q, Vector3 v) {
-        Vector3 r = q * (Vector3.down * length);
-        Vector3 torque = Vector3.Cross(r, Vector3.down * gravity) - damping * v;
-        Quaternion qDot = ScaleQuaternion(new Quaternion(0, v.x, v.y, v.z) * q, 0.5f);
-
-        return (torque, qDot);
-    }
-
-    private Quaternion ScaleQuaternion(Quaternion q, float scale) {
-        return new Quaternion(q.x * scale, q.y * scale, q.z * scale, q.w * scale);
     }
 
     private void UpdateSwing() {
@@ -134,12 +71,10 @@ public class Player : MonoBehaviour {
             thetaDdot = 0;
         } //else if(theta < epsilon) {theta = epsilon;}
         else {
-            thetaDdot = -gravity / length * Mathf.Sin(theta) + Mathf.Sin(theta) * Mathf.Cos(theta) * phiDot * phiDot - (damping * thetaDot);
+            thetaDdot = -gravity / length * Mathf.Sin(theta) + Mathf.Sin(theta) * Mathf.Cos(theta) * alpha * alpha - (damping * omega);
         }
-        if (Mathf.Abs(theta) < epsilon || 180 - Mathf.Abs(theta) < epsilon) { phiDdot = -(damping * phiDot); }
-        else { phiDdot = -(2 * thetaDot * phiDot) / Mathf.Tan(theta) - (damping * phiDot); }
-
-
+        if (Mathf.Abs(theta) < epsilon || 180 - Mathf.Abs(theta) < epsilon) { phiDdot = -(damping * alpha); }
+        else { phiDdot = -(2 * omega * alpha) / Mathf.Tan(theta) - (damping * alpha); }
 
         //Debug.Log("\ntheta: " + theta + ", ThetaDot: " + thetaDot + ", ThetaDotDot" + thetaDdot + "\tPhi: " + phi + ", PhiDot: " + phiDot + ", PhiDotDot: " + phiDdot);
 
