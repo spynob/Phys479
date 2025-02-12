@@ -64,8 +64,11 @@ public class Player : MonoBehaviour {
             thetaDdot = -gravity / length * Mathf.Sin(theta) + Mathf.Sin(theta) * Mathf.Cos(theta) * phiDot * phiDot - (damping * thetaDot);
         }
         if (Mathf.Abs(theta) < epsilon || 180 - Mathf.Abs(theta) < epsilon) { phiDdot = -(damping * phiDot); }
-        else { phiDdot = -(2 * thetaDot * phiDot) / Mathf.Tan(theta) - (damping * phiDot); }
-        if (theta < epsilon) { theta = epsilon; }
+        else {
+            if (theta < epsilon) { theta = epsilon; }
+            phiDdot = -(2 * thetaDot * phiDot) / Mathf.Tan(theta) - (damping * phiDot);
+        }
+
 
         float dt = Time.deltaTime;
         thetaDot += thetaDdot * dt;
