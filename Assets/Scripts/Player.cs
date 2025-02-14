@@ -56,7 +56,7 @@ public class Player : MonoBehaviour {
         Vector3 relativePos = transform.position - Anchor.transform.position;
         length = relativePos.magnitude;
         if (length < epsilonLength) { theta = 0; phi = 0; return; }
-        theta = Mathf.Acos(relativePos.y / length);
+        theta = Mathf.Acos(-relativePos.y / length);
         phi = Mathf.Atan2(relativePos.z, relativePos.x);
     }
 
