@@ -29,6 +29,10 @@ public class Player : MonoBehaviour {
     private float epsilon = 0.001f;
     private float epsilonLength = 0.1f;
 
+
+    //thetaDdot = -gravity / length * Mathf.Sin(theta) + Mathf.Sin(theta) * Mathf.Cos(theta) * alpha * alpha - (damping * omega);
+    //phiDdot = -(2 * omega * alpha) / Mathf.Tan(theta) - (damping * alpha);
+
     private void Awake() {
         GetInput = GetComponent<InputSubscription>();
         rb = GetComponent<Rigidbody>();
@@ -59,29 +63,16 @@ public class Player : MonoBehaviour {
     void FixedUpdate() {
         Debug.Log("Theta: " + theta + ", omega: " + omega + ", phi: " + phi + ", alpha: " + alpha);
         float[] state = { theta, omega, phi, alpha };
-        RungeKuttaStep(state, Time.fixedDeltaTime);
+        RungeKuttaStep(Time.fixedDeltaTime, state);
+        Debug.Log("Theta: " + theta + ", omega: " + omega + ", phi: " + phi + ", alpha: " + alpha);
         theta = state[0];
         omega = state[1];
         phi = state[2];
         alpha = state[3];
-    }
-
-    private void UpdateSwing() {
-        if (length < epsilon) {
-            thetaDdot = 0;
-        } //else if(theta < epsilon) {theta = epsilon;}
-        else {
-            thetaDdot = -gravity / length * Mathf.Sin(theta) + Mathf.Sin(theta) * Mathf.Cos(theta) * alpha * alpha - (damping * omega);
-        }
-        if (Mathf.Abs(theta) < epsilon || 180 - Mathf.Abs(theta) < epsilon) { phiDdot = -(damping * alpha); }
-        else { phiDdot = -(2 * omega * alpha) / Mathf.Tan(theta) - (damping * alpha); }
-
-        //Debug.Log("\ntheta: " + theta + ", ThetaDot: " + thetaDot + ", ThetaDotDot" + thetaDdot + "\tPhi: " + phi + ", PhiDot: " + phiDot + ", PhiDotDot: " + phiDdot);
-
         transform.position = Anchor.transform.position + SphericalToCartesian(theta, phi, length);
     }
 
-    void RungeKuttaStep(float[] state, float h) {
+    void RungeKuttaStep(float h, float[] state) {
         float[] k1 = Derivatives(state);
         float[] k2 = Derivatives(AddVectors(state, MultiplyVector(k1, h / 2)));
         float[] k3 = Derivatives(AddVectors(state, MultiplyVector(k2, h / 2)));
@@ -97,10 +88,10 @@ public class Player : MonoBehaviour {
         float omega = state[1];
         float alpha = state[3];
 
-        float omegaDot = -gravity / length * Mathf.Sin(theta) * Mathf.Cos(theta) * alpha * alpha - damping * omega;
-        float alphaDot = -2 * omega * alpha / Mathf.Tan(theta) - damping * alpha;
+        thetaDdot = -gravity / length * Mathf.Sin(theta) + Mathf.Sin(theta) * Mathf.Cos(theta) * alpha * alpha - damping * omega;
+        phiDdot = -2 * omega * alpha / Mathf.Tan(theta) - damping * alpha;
 
-        return new float[] { omega, omegaDot, alpha, alphaDot };
+        return new float[] { omega, thetaDdot, alpha, phiDdot };
     }
 
     float[] AddVectors(float[] a, float[] b) {
