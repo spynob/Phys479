@@ -5,6 +5,11 @@ using UnityEngine.UIElements;
 
 public class Player : MonoBehaviour {
 
+    // Particles
+    public bool MovementParticles = false;
+    public GameObject particle;
+    public float ParticleInterval = 0.5f;
+
     // Input Movement
     InputSubscription GetInput;
     Vector2 playerMovement;
@@ -22,14 +27,12 @@ public class Player : MonoBehaviour {
     // Anchor stuff
     public GameObject[] Anchors;
     private int anchorIndex = 0;
-    private bool swinging = false;
-
 
     // Pendulum stuff
     private float theta; // Polar angle
     private float phi; // Azimuthal angle
     private float omega = 0;
-    private float alpha = 0.5f;
+    private float alpha = 0f;
     private float thetaDdot = 0;
     private float phiDdot = 0;
     private float epsilon = 0.001f;
@@ -43,7 +46,7 @@ public class Player : MonoBehaviour {
         GetInput = GetComponent<InputSubscription>();
         rb = GetComponent<Rigidbody>();
         Grapple();
-
+        InvokeRepeating(nameof(SpawnParticle), 0f, ParticleInterval);
     }
 
     private void Update() {
@@ -151,6 +154,12 @@ public class Player : MonoBehaviour {
         float t = Mathf.Acos(-relativePos.y / r);
         float p = Mathf.Atan2(relativePos.z, relativePos.x);
         return new Vector3(t, p, r);
+    }
+
+    private void SpawnParticle() {
+        if (MovementParticles) {
+            Instantiate(particle, transform.position, Quaternion.identity);
+        }
     }
 }
 
