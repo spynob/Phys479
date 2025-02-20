@@ -1,3 +1,4 @@
+using System;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -17,7 +18,12 @@ public class Player : MonoBehaviour {
     public float gravity = 9.81f;
     public float damping = 0.1f;
     private float length = 1;
-    public GameObject Anchor;
+
+    // Anchor stuff
+    public GameObject[] Anchors;
+    private int anchorIndex = 0;
+    private bool swinging = false;
+
 
     // Pendulum stuff
     private float theta; // Polar angle
@@ -41,19 +47,42 @@ public class Player : MonoBehaviour {
     }
 
     private void Update() {
+        if (GetInput.Swing) {
+            Debug.Log("Swing");
+
+            SwitchAnchor();
+
+        }
         if (grounded) {
             playerMovement = new Vector2(GetInput.MoveInput.x, GetInput.MoveInput.y);
         }
         if (!grounded) {
-            GetAnchor();
             //UpdateSwing();
         }
     }
 
-    private void GetAnchor() { }
+    void SwitchAnchor() {
+        Vector3 cartesianMomentum = GetCartesianMomentum(theta, omega, phi, alpha, length);
+        anchorIndex++;
+        Grapple();
+        (omega, alpha) = GetSphericalMomentum(cartesianMomentum, theta, phi, length);
+    }
+
+    private (float, float) GetSphericalMomentum(Vector3 cartesianMomentum, float pTheta, float pPhi, float pLength) {
+        float o = cartesianMomentum.y / (pLength * Mathf.Sin(pTheta));
+        float a = (cartesianMomentum.y * Mathf.Cos(pPhi) / Mathf.Tan(pTheta) - cartesianMomentum.x) / (pLength * Mathf.Sin(pTheta) * Mathf.Sin(pPhi));
+        return (o, a);
+    }
+
+    private Vector3 GetCartesianMomentum(float pTheta, float pOmega, float pPhi, float pAlpha, float pLength) {
+        float xDot = pLength * (pOmega * Mathf.Cos(pTheta) * Mathf.Cos(pPhi) - pAlpha * Mathf.Sin(pTheta) * Mathf.Sin(pPhi));
+        float yDot = pLength * pOmega * Mathf.Sin(pTheta);
+        float zDot = pLength * (pOmega * Mathf.Cos(pTheta) * Mathf.Cos(pPhi) + pAlpha * Mathf.Sin(pTheta) * Mathf.Sin(pPhi));
+        return new Vector3(xDot, yDot, zDot);
+    }
 
     private void Grapple() {
-        Vector3 relativePos = transform.position - Anchor.transform.position;
+        Vector3 relativePos = transform.position - Anchors[anchorIndex].transform.position;
         length = relativePos.magnitude;
         if (length < epsilonLength) { theta = 0; phi = 0; return; }
         theta = Mathf.Acos(-relativePos.y / length);
@@ -61,15 +90,13 @@ public class Player : MonoBehaviour {
     }
 
     void FixedUpdate() {
-        Debug.Log("Theta: " + theta + ", omega: " + omega + ", phi: " + phi + ", alpha: " + alpha);
         float[] state = { theta, omega, phi, alpha };
         RungeKuttaStep(Time.fixedDeltaTime, state);
-        Debug.Log("Theta: " + theta + ", omega: " + omega + ", phi: " + phi + ", alpha: " + alpha);
         theta = state[0];
         omega = state[1];
         phi = state[2];
         alpha = state[3];
-        transform.position = Anchor.transform.position + SphericalToCartesian(theta, phi, length);
+        transform.position = Anchors[anchorIndex].transform.position + SphericalToCartesian(theta, phi, length);
     }
 
     void RungeKuttaStep(float h, float[] state) {
