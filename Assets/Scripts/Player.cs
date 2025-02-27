@@ -66,7 +66,7 @@ public class Player : MonoBehaviour {
 
     void SwitchAnchor() {
         Vector3 cartesianMomentum = GetCartesianMomentum(theta, omega, phi, alpha, length);
-        anchorIndex++;
+        anchorIndex = Mathf.Min(anchorIndex + 1, Anchors.Length - 1);
         Grapple();
         (omega, alpha) = GetSphericalMomentum(cartesianMomentum, theta, phi, length);
     }
