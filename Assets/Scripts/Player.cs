@@ -12,11 +12,6 @@ public class Player : MonoBehaviour {
 
     // Input Movement
     InputSubscription GetInput;
-    Vector2 playerMovement;
-    Rigidbody rb;
-    bool grounded = false;
-    private Vector3 Velocity;
-    private Vector3 Acceleration;
 
     // Properties
     public float mass = 100;
@@ -50,7 +45,6 @@ public class Player : MonoBehaviour {
 
     private void Awake() {
         GetInput = GetComponent<InputSubscription>();
-        rb = GetComponent<Rigidbody>();
         SaveLength();
         Grapple();
         InvokeRepeating(nameof(SpawnParticle), 0f, ParticleInterval);
@@ -64,9 +58,6 @@ public class Player : MonoBehaviour {
         if (!Swinging) {
             FreeFall();
             CheckIsOutRadius();
-        }
-        if (grounded) {
-            playerMovement = new Vector2(GetInput.MoveInput.x, GetInput.MoveInput.y);
         }
     }
 
@@ -99,7 +90,11 @@ public class Player : MonoBehaviour {
     // Not sure about this one
     private (float, float) GetSphericalMomentum(Vector3 cartesianMomentum, float pTheta, float pPhi, float pLength) {
         float o = (Mathf.Cos(pTheta) * (cartesianMomentum.x * Mathf.Cos(pPhi) + cartesianMomentum.z * Mathf.Sin(pPhi)) + cartesianMomentum.y * Mathf.Sin(pTheta)) / pLength;
-        float a = (cartesianMomentum.z * Mathf.Cos(pPhi) - cartesianMomentum.x * Mathf.Sin(pPhi)) / (pLength * Mathf.Sin(pTheta));
+
+        float dividant = pLength * Mathf.Sin(pTheta);
+        float a;
+        if (dividant < epsilon) { a = 0; }
+        else { a = (cartesianMomentum.z * Mathf.Cos(pPhi) - cartesianMomentum.x * Mathf.Sin(pPhi)) / (pLength * Mathf.Sin(pTheta)); }
         return (o, a);
     }
 
@@ -147,13 +142,11 @@ public class Player : MonoBehaviour {
         float omega = state[1];
         float alpha = state[3];
 
+        thetaDdot = -gravity / length * Mathf.Sin(theta) + Mathf.Sin(theta) * Mathf.Cos(theta) * alpha * alpha - damping * omega;
+
         float dividant = Mathf.Tan(theta);
         if (Mathf.Abs(dividant) > epsilon) { phiDdot = -2 * omega * alpha / dividant - damping * alpha; }
         else { phiDdot = 0; }
-
-        thetaDdot = -gravity / length * Mathf.Sin(theta) + Mathf.Sin(theta) * Mathf.Cos(theta) * alpha * alpha - damping * omega;
-
-
         return new float[] { omega, thetaDdot, alpha, phiDdot };
     }
 
@@ -195,4 +188,3 @@ public class Player : MonoBehaviour {
         }
     }
 }
-
