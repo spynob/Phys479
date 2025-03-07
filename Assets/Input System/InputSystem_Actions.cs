@@ -497,7 +497,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""name"": """",
                     ""id"": ""f6fdcb7c-436f-402c-bdc0-fa4e6811e8ab"",
                     ""path"": ""<Keyboard>/space"",
-                    ""interactions"": ""Press"",
+                    ""interactions"": ""Press(behavior=2)"",
                     ""processors"": """",
                     ""groups"": "";Keyboard&Mouse"",
                     ""action"": ""Swing"",
