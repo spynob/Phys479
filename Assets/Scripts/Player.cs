@@ -12,11 +12,6 @@ public class Player : MonoBehaviour {
 
     // Input Movement
     InputSubscription GetInput;
-    Vector2 playerMovement;
-    Rigidbody rb;
-    bool grounded = false;
-    private Vector3 Velocity;
-    private Vector3 Acceleration;
 
     // Properties
     public float mass = 100;
@@ -38,15 +33,11 @@ public class Player : MonoBehaviour {
     private float epsilon = 0.001f;
     private float epsilonLength = 0.1f;
 
-    // Momentum Transfer
-    private bool Swinging = true;
-
     //thetaDdot = -gravity / length * Mathf.Sin(theta) + Mathf.Sin(theta) * Mathf.Cos(theta) * alpha * alpha - (damping * omega);
     //phiDdot = -(2 * omega * alpha) / Mathf.Tan(theta) - (damping * alpha);
 
     private void Awake() {
         GetInput = GetComponent<InputSubscription>();
-        rb = GetComponent<Rigidbody>();
         Grapple();
         InvokeRepeating(nameof(SpawnParticle), 0f, ParticleInterval);
     }
@@ -54,13 +45,6 @@ public class Player : MonoBehaviour {
     private void Update() {
         if (GetInput.Swing) {
             SwitchAnchor();
-
-        }
-        if (grounded) {
-            playerMovement = new Vector2(GetInput.MoveInput.x, GetInput.MoveInput.y);
-        }
-        if (!grounded) {
-            //UpdateSwing();
         }
     }
 
@@ -98,16 +82,14 @@ public class Player : MonoBehaviour {
     }
 
     void FixedUpdate() {
-        if (Swinging) {
-            float[] state = { theta, omega, phi, alpha };
-            RungeKuttaStep(Time.fixedDeltaTime, state);
-            theta = state[0];
-            omega = state[1];
-            phi = state[2];
-            alpha = state[3];
-            //Debug.Log("Theta: " + theta + ", Omega: " + omega + ", Phi: " + phi + ", Alpha: " + alpha);
-            transform.position = Anchors[anchorIndex].transform.position + SphericalToCartesian(theta, phi, length);
-        }
+        float[] state = { theta, omega, phi, alpha };
+        RungeKuttaStep(Time.fixedDeltaTime, state);
+        theta = state[0];
+        omega = state[1];
+        phi = state[2];
+        alpha = state[3];
+        //Debug.Log("Theta: " + theta + ", Omega: " + omega + ", Phi: " + phi + ", Alpha: " + alpha);
+        transform.position = Anchors[anchorIndex].transform.position + SphericalToCartesian(theta, phi, length);
     }
 
     void RungeKuttaStep(float h, float[] state) {
@@ -126,13 +108,11 @@ public class Player : MonoBehaviour {
         float omega = state[1];
         float alpha = state[3];
 
+        thetaDdot = -gravity / length * Mathf.Sin(theta) + Mathf.Sin(theta) * Mathf.Cos(theta) * alpha * alpha - damping * omega;
+
         float dividant = Mathf.Tan(theta);
         if (Mathf.Abs(dividant) > epsilon) { phiDdot = -2 * omega * alpha / dividant - damping * alpha; }
         else { phiDdot = 0; }
-
-        thetaDdot = -gravity / length * Mathf.Sin(theta) + Mathf.Sin(theta) * Mathf.Cos(theta) * alpha * alpha - damping * omega;
-
-
         return new float[] { omega, thetaDdot, alpha, phiDdot };
     }
 
@@ -174,4 +154,3 @@ public class Player : MonoBehaviour {
         }
     }
 }
-
