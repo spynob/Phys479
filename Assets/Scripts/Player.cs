@@ -21,7 +21,7 @@ public class Player : MonoBehaviour {
     // Properties
     public float mass = 100;
     public float gravity = 9.81f;
-    public float damping = 0.1f;
+    public float damping = 0.01f;
     private float length = 1;
 
     // Anchor stuff
@@ -31,12 +31,18 @@ public class Player : MonoBehaviour {
     // Pendulum stuff
     private float theta; // Polar angle
     private float phi; // Azimuthal angle
-    private float omega = 0;
-    private float alpha = 0f;
+    private float omega = 2;
+    private float alpha = 0.5f;
     private float thetaDdot = 0;
     private float phiDdot = 0;
     private float epsilon = 0.001f;
     private float epsilonLength = 0.1f;
+
+    // Momentum Transfer
+    private bool Swinging = true;
+    private float xMom;
+    private float yMom;
+    private float zMom;
 
 
     //thetaDdot = -gravity / length * Mathf.Sin(theta) + Mathf.Sin(theta) * Mathf.Cos(theta) * alpha * alpha - (damping * omega);
@@ -45,61 +51,84 @@ public class Player : MonoBehaviour {
     private void Awake() {
         GetInput = GetComponent<InputSubscription>();
         rb = GetComponent<Rigidbody>();
+        SaveLength();
         Grapple();
         InvokeRepeating(nameof(SpawnParticle), 0f, ParticleInterval);
     }
 
     private void Update() {
         if (GetInput.Swing) {
-            Debug.Log("Swing");
-
             SwitchAnchor();
-
+            Swinging = false;
+        }
+        if (!Swinging) {
+            FreeFall();
+            CheckIsOutRadius();
         }
         if (grounded) {
             playerMovement = new Vector2(GetInput.MoveInput.x, GetInput.MoveInput.y);
         }
-        if (!grounded) {
-            //UpdateSwing();
+    }
+
+    void FreeFall() {
+        yMom -= (gravity + damping * yMom) * Time.deltaTime;
+        transform.position = new Vector3(transform.position.x + xMom * (1 - damping) * Time.deltaTime, transform.position.y + yMom * Time.deltaTime, transform.position.z + zMom * (1 - damping) * Time.deltaTime);
+    }
+
+    void CheckIsOutRadius() {
+        Vector3 relativePos = transform.position - Anchors[anchorIndex].transform.position;
+        float distance = relativePos.magnitude;
+        if (distance >= length) { // update angles and set swinging to true
+            Grapple();
+            Swinging = true;
+            (omega, alpha) = GetSphericalMomentum(new Vector3(xMom, yMom, zMom), theta, phi, length);
         }
     }
 
-    void SwitchAnchor() {
-        Vector3 cartesianMomentum = GetCartesianMomentum(theta, omega, phi, alpha, length);
-        anchorIndex++;
-        Grapple();
-        (omega, alpha) = GetSphericalMomentum(cartesianMomentum, theta, phi, length);
+    void SaveLength() {
+        Vector3 relativePos = transform.position - Anchors[anchorIndex].transform.position;
+        length = relativePos.magnitude;
     }
 
+    void SwitchAnchor() {
+        anchorIndex = Mathf.Min(2, anchorIndex + 1);
+        (xMom, yMom, zMom) = GetCartesianMomentum(theta, omega, phi, alpha, length);
+        SaveLength();
+    }
+
+    // Not sure about this one
     private (float, float) GetSphericalMomentum(Vector3 cartesianMomentum, float pTheta, float pPhi, float pLength) {
-        float o = cartesianMomentum.y / (pLength * Mathf.Sin(pTheta));
-        float a = (cartesianMomentum.y * Mathf.Cos(pPhi) / Mathf.Tan(pTheta) - cartesianMomentum.x) / (pLength * Mathf.Sin(pTheta) * Mathf.Sin(pPhi));
+        float o = (Mathf.Cos(pTheta) * (cartesianMomentum.x * Mathf.Cos(pPhi) + cartesianMomentum.z * Mathf.Sin(pPhi)) + cartesianMomentum.y * Mathf.Sin(pTheta)) / pLength;
+        float a = (cartesianMomentum.z * Mathf.Cos(pPhi) - cartesianMomentum.x * Mathf.Sin(pPhi)) / (pLength * Mathf.Sin(pTheta));
         return (o, a);
     }
 
-    private Vector3 GetCartesianMomentum(float pTheta, float pOmega, float pPhi, float pAlpha, float pLength) {
+    private (float, float, float) GetCartesianMomentum(float pTheta, float pOmega, float pPhi, float pAlpha, float pLength) {
         float xDot = pLength * (pOmega * Mathf.Cos(pTheta) * Mathf.Cos(pPhi) - pAlpha * Mathf.Sin(pTheta) * Mathf.Sin(pPhi));
         float yDot = pLength * pOmega * Mathf.Sin(pTheta);
-        float zDot = pLength * (pOmega * Mathf.Cos(pTheta) * Mathf.Cos(pPhi) + pAlpha * Mathf.Sin(pTheta) * Mathf.Sin(pPhi));
-        return new Vector3(xDot, yDot, zDot);
+        float zDot = pLength * (pOmega * Mathf.Cos(pTheta) * Mathf.Sin(pPhi) + pAlpha * Mathf.Sin(pTheta) * Mathf.Cos(pPhi));
+        return (xDot, yDot, zDot);
     }
 
     private void Grapple() {
         Vector3 relativePos = transform.position - Anchors[anchorIndex].transform.position;
         length = relativePos.magnitude;
-        if (length < epsilonLength) { theta = 0; phi = 0; return; }
+        if (length < epsilonLength) { theta = 0; phi = 0; length = epsilonLength; return; }
         theta = Mathf.Acos(-relativePos.y / length);
         phi = Mathf.Atan2(relativePos.z, relativePos.x);
     }
 
     void FixedUpdate() {
-        float[] state = { theta, omega, phi, alpha };
-        RungeKuttaStep(Time.fixedDeltaTime, state);
-        theta = state[0];
-        omega = state[1];
-        phi = state[2];
-        alpha = state[3];
-        transform.position = Anchors[anchorIndex].transform.position + SphericalToCartesian(theta, phi, length);
+        if (Swinging) {
+            float[] state = { theta, omega, phi, alpha };
+            RungeKuttaStep(Time.fixedDeltaTime, state);
+            theta = state[0];
+            omega = state[1];
+            phi = state[2];
+            alpha = state[3];
+            //Debug.Log("Theta: " + theta + ", Omega: " + omega + ", Phi: " + phi + ", Alpha: " + alpha);
+            transform.position = Anchors[anchorIndex].transform.position + SphericalToCartesian(theta, phi, length);
+        }
     }
 
     void RungeKuttaStep(float h, float[] state) {
@@ -118,8 +147,12 @@ public class Player : MonoBehaviour {
         float omega = state[1];
         float alpha = state[3];
 
+        float dividant = Mathf.Tan(theta);
+        if (Mathf.Abs(dividant) > epsilon) { phiDdot = -2 * omega * alpha / dividant - damping * alpha; }
+        else { phiDdot = 0; }
+
         thetaDdot = -gravity / length * Mathf.Sin(theta) + Mathf.Sin(theta) * Mathf.Cos(theta) * alpha * alpha - damping * omega;
-        phiDdot = -2 * omega * alpha / Mathf.Tan(theta) - damping * alpha;
+
 
         return new float[] { omega, thetaDdot, alpha, phiDdot };
     }
