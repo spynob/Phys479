@@ -1,6 +1,7 @@
 using System;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
 
 public class Player : MonoBehaviour {
@@ -11,12 +12,8 @@ public class Player : MonoBehaviour {
     public float ParticleInterval = 0.5f;
 
     // Input Movement
-    InputSubscription GetInput;
-    Vector2 playerMovement;
-    Rigidbody rb;
-    bool grounded = false;
-    private Vector3 Velocity;
-    private Vector3 Acceleration;
+    [SerializeField] InputSubscription GetInput;
+    bool Switching = false;
 
     // Properties
     public float mass = 100;
@@ -46,22 +43,43 @@ public class Player : MonoBehaviour {
 
     private void Awake() {
         GetInput = GetComponent<InputSubscription>();
-        rb = GetComponent<Rigidbody>();
+        SaveLength();
         Grapple();
         InvokeRepeating(nameof(SpawnParticle), 0f, ParticleInterval);
     }
 
     private void Update() {
-        if (GetInput.Swing) {
+        if (GetInput.Swing && !Switching) {
+            Debug.Log("SWITCH");
             SwitchAnchor();
+            Swinging = false;
+            Switching = true;
+        }
+        if (!GetInput.Swing) { Switching = false; }
+        if (!Swinging) {
+            FreeFall();
+            CheckIsOutRadius();
+        }
+    }
 
+    void FreeFall() {
+        yMom -= (gravity + damping * yMom) * Time.deltaTime;
+        transform.position = new Vector3(transform.position.x + xMom * (1 - damping) * Time.deltaTime, transform.position.y + yMom * Time.deltaTime, transform.position.z + zMom * (1 - damping) * Time.deltaTime);
+    }
+
+    void CheckIsOutRadius() {
+        Vector3 relativePos = transform.position - Anchors[anchorIndex].transform.position;
+        float distance = relativePos.magnitude;
+        if (distance >= length) { // update angles and set swinging to true
+            Grapple();
+            Swinging = true;
+            (omega, alpha) = GetSphericalMomentum(new Vector3(xMom, yMom, zMom), theta, phi, length);
         }
-        if (grounded) {
-            playerMovement = new Vector2(GetInput.MoveInput.x, GetInput.MoveInput.y);
-        }
-        if (!grounded) {
-            //UpdateSwing();
-        }
+    }
+
+    void SaveLength() {
+        Vector3 relativePos = transform.position - Anchors[anchorIndex].transform.position;
+        length = relativePos.magnitude;
     }
 
     void SwitchAnchor() {
@@ -75,10 +93,11 @@ public class Player : MonoBehaviour {
     // Not sure about this one
     private (float, float) GetSphericalMomentum(Vector3 cartesianMomentum, float pTheta, float pPhi, float pLength) {
         float o = (Mathf.Cos(pTheta) * (cartesianMomentum.x * Mathf.Cos(pPhi) + cartesianMomentum.z * Mathf.Sin(pPhi)) + cartesianMomentum.y * Mathf.Sin(pTheta)) / pLength;
-        float a;
+
         float dividant = pLength * Mathf.Sin(pTheta);
+        float a;
         if (dividant < epsilon) { a = 0; }
-        else { a = (cartesianMomentum.z * Mathf.Cos(pPhi) - cartesianMomentum.x * Mathf.Sin(pPhi)) / dividant; }
+        else { a = (cartesianMomentum.z * Mathf.Cos(pPhi) - cartesianMomentum.x * Mathf.Sin(pPhi)) / (pLength * Mathf.Sin(pTheta)); }
         return (o, a);
     }
 
@@ -126,13 +145,11 @@ public class Player : MonoBehaviour {
         float omega = state[1];
         float alpha = state[3];
 
+        thetaDdot = -gravity / length * Mathf.Sin(theta) + Mathf.Sin(theta) * Mathf.Cos(theta) * alpha * alpha - damping * omega;
+
         float dividant = Mathf.Tan(theta);
         if (Mathf.Abs(dividant) > epsilon) { phiDdot = -2 * omega * alpha / dividant - damping * alpha; }
         else { phiDdot = 0; }
-
-        thetaDdot = -gravity / length * Mathf.Sin(theta) + Mathf.Sin(theta) * Mathf.Cos(theta) * alpha * alpha - damping * omega;
-
-
         return new float[] { omega, thetaDdot, alpha, phiDdot };
     }
 
@@ -174,4 +191,3 @@ public class Player : MonoBehaviour {
         }
     }
 }
-

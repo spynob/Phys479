@@ -999,6 +999,54 @@
                     "isPartOfComposite": false
                 }
             ]
+        },
+        {
+            "name": "SpiderMan",
+            "id": "8620882f-62f5-438f-ada5-9ab921d44f48",
+            "actions": [
+                {
+                    "name": "Swing",
+                    "type": "Value",
+                    "id": "3422c906-89e2-4993-a0bd-428be4cd89df",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
+                    "name": "Swing2",
+                    "type": "Button",
+                    "id": "c29f8128-e75f-415d-b596-7eaff1e6fb9d",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "2139e073-a9a0-483e-b88f-5ce7e71fcd25",
+                    "path": "<Keyboard>/space",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard&Mouse",
+                    "action": "Swing",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "3cf22174-36bb-425c-a7c1-ec9149ac9506",
+                    "path": "<Keyboard>/leftShift",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard&Mouse",
+                    "action": "Swing2",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
         }
     ],
     "controlSchemes": [
