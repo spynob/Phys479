@@ -37,6 +37,9 @@ public class Player : MonoBehaviour {
 
     // Momentum Transfer
     private bool Swinging = true;
+    float xMom;
+    float yMom;
+    float zMom;
 
     //thetaDdot = -gravity / length * Mathf.Sin(theta) + Mathf.Sin(theta) * Mathf.Cos(theta) * alpha * alpha - (damping * omega);
     //phiDdot = -(2 * omega * alpha) / Mathf.Tan(theta) - (damping * alpha);
