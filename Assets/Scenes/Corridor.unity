@@ -744,6 +744,7 @@ MonoBehaviour:
   MovementParticles: 1
   particle: {fileID: 4154735860701002386, guid: ff1bb5148e2790a4e9962da00987abd1, type: 3}
   ParticleInterval: 0.5
+  GetInput: {fileID: 599610584}
   mass: 100
   gravity: 9.81
   damping: 0.1

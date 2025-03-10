@@ -1021,6 +1021,54 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""isPartOfComposite"": false
                 }
             ]
+        },
+        {
+            ""name"": ""SpiderMan"",
+            ""id"": ""8620882f-62f5-438f-ada5-9ab921d44f48"",
+            ""actions"": [
+                {
+                    ""name"": ""Swing"",
+                    ""type"": ""Value"",
+                    ""id"": ""3422c906-89e2-4993-a0bd-428be4cd89df"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""Swing2"",
+                    ""type"": ""Button"",
+                    ""id"": ""c29f8128-e75f-415d-b596-7eaff1e6fb9d"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""2139e073-a9a0-483e-b88f-5ce7e71fcd25"",
+                    ""path"": ""<Keyboard>/space"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Keyboard&Mouse"",
+                    ""action"": ""Swing"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""3cf22174-36bb-425c-a7c1-ec9149ac9506"",
+                    ""path"": ""<Keyboard>/leftShift"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Keyboard&Mouse"",
+                    ""action"": ""Swing2"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
         }
     ],
     ""controlSchemes"": [
@@ -1110,12 +1158,17 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         m_UI_ScrollWheel = m_UI.FindAction("ScrollWheel", throwIfNotFound: true);
         m_UI_TrackedDevicePosition = m_UI.FindAction("TrackedDevicePosition", throwIfNotFound: true);
         m_UI_TrackedDeviceOrientation = m_UI.FindAction("TrackedDeviceOrientation", throwIfNotFound: true);
+        // SpiderMan
+        m_SpiderMan = asset.FindActionMap("SpiderMan", throwIfNotFound: true);
+        m_SpiderMan_Swing = m_SpiderMan.FindAction("Swing", throwIfNotFound: true);
+        m_SpiderMan_Swing2 = m_SpiderMan.FindAction("Swing2", throwIfNotFound: true);
     }
 
     ~@InputSystem_Actions()
     {
         UnityEngine.Debug.Assert(!m_Player.enabled, "This will cause a leak and performance issues, InputSystem_Actions.Player.Disable() has not been called.");
         UnityEngine.Debug.Assert(!m_UI.enabled, "This will cause a leak and performance issues, InputSystem_Actions.UI.Disable() has not been called.");
+        UnityEngine.Debug.Assert(!m_SpiderMan.enabled, "This will cause a leak and performance issues, InputSystem_Actions.SpiderMan.Disable() has not been called.");
     }
 
     public void Dispose()
@@ -1409,6 +1462,60 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         }
     }
     public UIActions @UI => new UIActions(this);
+
+    // SpiderMan
+    private readonly InputActionMap m_SpiderMan;
+    private List<ISpiderManActions> m_SpiderManActionsCallbackInterfaces = new List<ISpiderManActions>();
+    private readonly InputAction m_SpiderMan_Swing;
+    private readonly InputAction m_SpiderMan_Swing2;
+    public struct SpiderManActions
+    {
+        private @InputSystem_Actions m_Wrapper;
+        public SpiderManActions(@InputSystem_Actions wrapper) { m_Wrapper = wrapper; }
+        public InputAction @Swing => m_Wrapper.m_SpiderMan_Swing;
+        public InputAction @Swing2 => m_Wrapper.m_SpiderMan_Swing2;
+        public InputActionMap Get() { return m_Wrapper.m_SpiderMan; }
+        public void Enable() { Get().Enable(); }
+        public void Disable() { Get().Disable(); }
+        public bool enabled => Get().enabled;
+        public static implicit operator InputActionMap(SpiderManActions set) { return set.Get(); }
+        public void AddCallbacks(ISpiderManActions instance)
+        {
+            if (instance == null || m_Wrapper.m_SpiderManActionsCallbackInterfaces.Contains(instance)) return;
+            m_Wrapper.m_SpiderManActionsCallbackInterfaces.Add(instance);
+            @Swing.started += instance.OnSwing;
+            @Swing.performed += instance.OnSwing;
+            @Swing.canceled += instance.OnSwing;
+            @Swing2.started += instance.OnSwing2;
+            @Swing2.performed += instance.OnSwing2;
+            @Swing2.canceled += instance.OnSwing2;
+        }
+
+        private void UnregisterCallbacks(ISpiderManActions instance)
+        {
+            @Swing.started -= instance.OnSwing;
+            @Swing.performed -= instance.OnSwing;
+            @Swing.canceled -= instance.OnSwing;
+            @Swing2.started -= instance.OnSwing2;
+            @Swing2.performed -= instance.OnSwing2;
+            @Swing2.canceled -= instance.OnSwing2;
+        }
+
+        public void RemoveCallbacks(ISpiderManActions instance)
+        {
+            if (m_Wrapper.m_SpiderManActionsCallbackInterfaces.Remove(instance))
+                UnregisterCallbacks(instance);
+        }
+
+        public void SetCallbacks(ISpiderManActions instance)
+        {
+            foreach (var item in m_Wrapper.m_SpiderManActionsCallbackInterfaces)
+                UnregisterCallbacks(item);
+            m_Wrapper.m_SpiderManActionsCallbackInterfaces.Clear();
+            AddCallbacks(instance);
+        }
+    }
+    public SpiderManActions @SpiderMan => new SpiderManActions(this);
     private int m_KeyboardMouseSchemeIndex = -1;
     public InputControlScheme KeyboardMouseScheme
     {
@@ -1479,5 +1586,10 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         void OnScrollWheel(InputAction.CallbackContext context);
         void OnTrackedDevicePosition(InputAction.CallbackContext context);
         void OnTrackedDeviceOrientation(InputAction.CallbackContext context);
+    }
+    public interface ISpiderManActions
+    {
+        void OnSwing(InputAction.CallbackContext context);
+        void OnSwing2(InputAction.CallbackContext context);
     }
 }

@@ -1,6 +1,7 @@
 using System;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
 
 public class Player : MonoBehaviour {
@@ -11,7 +12,8 @@ public class Player : MonoBehaviour {
     public float ParticleInterval = 0.5f;
 
     // Input Movement
-    InputSubscription GetInput;
+    [SerializeField] InputSubscription GetInput;
+    bool Switching = false;
 
     // Properties
     public float mass = 100;
@@ -51,10 +53,13 @@ public class Player : MonoBehaviour {
     }
 
     private void Update() {
-        if (GetInput.Swing) {
+        if (GetInput.Swing && !Switching) {
+            Debug.Log("SWITCH");
             SwitchAnchor();
             Swinging = false;
+            Switching = true;
         }
+        if (!GetInput.Swing) { Switching = false; }
         if (!Swinging) {
             FreeFall();
             CheckIsOutRadius();
