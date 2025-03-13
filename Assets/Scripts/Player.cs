@@ -19,17 +19,21 @@ public class Player : MonoBehaviour {
     public float mass = 100;
     public float gravity = 9.81f;
     public float damping = 0.01f;
-    private float length = 1;
+    public float k = 1;
 
     // Anchor stuff
     public GameObject[] Anchors;
     private int anchorIndex = 0;
 
     // Pendulum stuff
+    private float naturalLength;
+    private float length;
     private float theta; // Polar angle
     private float phi; // Azimuthal angle
-    private float omega = 2;
-    private float alpha = 0.5f;
+    private float lengthDot;
+    private float omega = 0;
+    private float alpha = 0f;
+    private float lengthDDot;
     private float thetaDdot = 0;
     private float phiDdot = 0;
     private float epsilon = 0.001f;
@@ -47,6 +51,8 @@ public class Player : MonoBehaviour {
 
     private void Awake() {
         GetInput = GetComponent<InputSubscription>();
+        damping = damping / mass;
+        k = k / mass;
         SaveLength();
         Grapple();
         InvokeRepeating(nameof(SpawnParticle), 0f, ParticleInterval);
@@ -74,16 +80,16 @@ public class Player : MonoBehaviour {
     void CheckIsOutRadius() {
         Vector3 relativePos = transform.position - Anchors[anchorIndex].transform.position;
         float distance = relativePos.magnitude;
-        if (distance >= length) { // update angles and set swinging to true
+        if (distance >= naturalLength) { // update angles and set swinging to true
             Grapple();
             Swinging = true;
-            (omega, alpha) = GetSphericalMomentum(new Vector3(xMom, yMom, zMom), theta, phi, length);
+            (omega, alpha) = GetSphericalMomentum(new Vector3(xMom, yMom, zMom), theta, phi, naturalLength);
         }
     }
 
     void SaveLength() {
         Vector3 relativePos = transform.position - Anchors[anchorIndex].transform.position;
-        length = relativePos.magnitude;
+        naturalLength = relativePos.magnitude;
     }
 
     void SwitchAnchor() {
@@ -112,21 +118,24 @@ public class Player : MonoBehaviour {
 
     private void Grapple() {
         Vector3 relativePos = transform.position - Anchors[anchorIndex].transform.position;
-        length = relativePos.magnitude;
-        if (length < epsilonLength) { theta = 0; phi = 0; length = epsilonLength; return; }
+        naturalLength = relativePos.magnitude;
+        if (naturalLength < epsilonLength) { theta = 0; phi = 0; naturalLength = epsilonLength; return; }
+        length = naturalLength;
         theta = Mathf.Acos(-relativePos.y / length);
         phi = Mathf.Atan2(relativePos.z, relativePos.x);
     }
 
     void FixedUpdate() {
         if (Swinging) {
-            float[] state = { theta, omega, phi, alpha };
+            float[] state = { theta, omega, phi, alpha, length, lengthDot };
             RungeKuttaStep(Time.fixedDeltaTime, state);
             theta = state[0];
             omega = state[1];
             phi = state[2];
             alpha = state[3];
-            //Debug.Log("Theta: " + theta + ", Omega: " + omega + ", Phi: " + phi + ", Alpha: " + alpha);
+            length = state[4];
+            lengthDot = state[5];
+            Debug.Log("Theta: " + theta + ", Omega: " + omega + ", Phi: " + phi + ", Alpha: " + alpha + ", Length: " + length + ", LengthDot: " + lengthDot + ", Natural Length: " + naturalLength);
             transform.position = Anchors[anchorIndex].transform.position + SphericalToCartesian(theta, phi, length);
         }
     }
@@ -146,13 +155,19 @@ public class Player : MonoBehaviour {
         float theta = state[0];
         float omega = state[1];
         float alpha = state[3];
+        float length = state[4];
+        float lengthDot = state[5];
 
-        thetaDdot = -gravity / length * Mathf.Sin(theta) + Mathf.Sin(theta) * Mathf.Cos(theta) * alpha * alpha - damping * omega;
+        if (length < epsilon) { length = epsilon; }
+        thetaDdot = Mathf.Sin(theta) * (Mathf.Cos(theta) * omega * omega - gravity / length) - damping * omega;
 
         float dividant = Mathf.Tan(theta);
-        if (Mathf.Abs(dividant) > epsilon) { phiDdot = -2 * omega * alpha / dividant - damping * alpha; }
+        if (Mathf.Abs(dividant) > epsilon) { phiDdot = -alpha * (damping + 2 * omega / dividant); }
         else { phiDdot = 0; }
-        return new float[] { omega, thetaDdot, alpha, phiDdot };
+
+        lengthDDot = gravity * Mathf.Cos(theta) + k * (naturalLength - length) + length * omega * omega * Mathf.Sin(phi) + length * alpha * alpha;
+
+        return new float[] { omega, thetaDdot, alpha, phiDdot, lengthDot, lengthDDot };
     }
 
     float[] AddVectors(float[] a, float[] b) {

@@ -747,7 +747,8 @@ MonoBehaviour:
   GetInput: {fileID: 599610584}
   mass: 100
   gravity: 9.81
-  damping: 0.1
+  damping: 0.01
+  k: 30
   Anchors:
   - {fileID: 972973545}
   - {fileID: 662100310}
