@@ -170,7 +170,7 @@ public class Player : MonoBehaviour {
         else { phiDdot = 0; alpha = 0; }
 
         // length
-        lengthDDot = omega * omega + alpha * alpha * Mathf.Sin(theta) * Mathf.Sin(theta) + gravity * Mathf.Cos(theta) / length - k * (1 - naturalLength / length);
+        lengthDDot = omega * omega + alpha * alpha * Mathf.Sin(theta) * Mathf.Sin(theta) + gravity * Mathf.Cos(theta) / length - k * (1 - naturalLength / length) - damping * lengthDot;
 
         return new float[] { omega, thetaDdot, alpha, phiDdot, lengthDot, lengthDDot };
     }
