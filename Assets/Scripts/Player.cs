@@ -20,6 +20,7 @@ public class Player : MonoBehaviour {
     public float gravity = 9.81f;
     public float damping = 0.01f;
     public float k = 1;
+    public float InitialStretching = 0;
 
     // Anchor stuff
     public GameObject[] Anchors;
@@ -55,6 +56,7 @@ public class Player : MonoBehaviour {
         k = k / mass;
         SaveLength();
         Grapple();
+        naturalLength = Mathf.Max(naturalLength - InitialStretching, epsilonLength + epsilonLength * 0.1f);
         InvokeRepeating(nameof(SpawnParticle), 0f, ParticleInterval);
     }
 
