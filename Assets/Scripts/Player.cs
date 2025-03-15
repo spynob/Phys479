@@ -32,11 +32,11 @@ public class Player : MonoBehaviour {
     private float phi; // Azimuthal angle
     private float lengthDot;
     private float omega = 0;
-    private float alpha = 0f;
+    private float alpha = 0.5f;
     private float lengthDDot;
     private float thetaDdot = 0;
     private float phiDdot = 0;
-    private float epsilon = 0.001f;
+    private float epsilon = 0.05f;
     private float epsilonLength = 0.1f;
 
     // Momentum Transfer
@@ -83,7 +83,7 @@ public class Player : MonoBehaviour {
         if (distance >= naturalLength) { // update angles and set swinging to true
             Grapple();
             Swinging = true;
-            (omega, alpha) = GetSphericalMomentum(new Vector3(xMom, yMom, zMom), theta, phi, naturalLength);
+            (omega, alpha, lengthDot) = GetSphericalMomentum(new Vector3(xMom, yMom, zMom), theta, phi, naturalLength);
         }
     }
 
@@ -94,25 +94,25 @@ public class Player : MonoBehaviour {
 
     void SwitchAnchor() {
         anchorIndex = Mathf.Min(2, anchorIndex + 1);
-        (xMom, yMom, zMom) = GetCartesianMomentum(theta, omega, phi, alpha, length);
+        (xMom, yMom, zMom) = GetCartesianMomentum(theta, omega, phi, alpha, length, lengthDot);
         SaveLength();
     }
 
     // Not sure about this one
-    private (float, float) GetSphericalMomentum(Vector3 cartesianMomentum, float pTheta, float pPhi, float pLength) {
+    private (float, float, float) GetSphericalMomentum(Vector3 cartesianMomentum, float pTheta, float pPhi, float pLength) {
+        float ld = Mathf.Sin(pTheta) * (cartesianMomentum.x * Mathf.Cos(pPhi) + cartesianMomentum.z * Mathf.Sin(pPhi)) - cartesianMomentum.y * Mathf.Cos(pTheta);
         float o = (Mathf.Cos(pTheta) * (cartesianMomentum.x * Mathf.Cos(pPhi) + cartesianMomentum.z * Mathf.Sin(pPhi)) + cartesianMomentum.y * Mathf.Sin(pTheta)) / pLength;
-
         float dividant = pLength * Mathf.Sin(pTheta);
         float a;
         if (dividant < epsilon) { a = 0; }
         else { a = (cartesianMomentum.z * Mathf.Cos(pPhi) - cartesianMomentum.x * Mathf.Sin(pPhi)) / (pLength * Mathf.Sin(pTheta)); }
-        return (o, a);
+        return (o, a, ld);
     }
 
-    private (float, float, float) GetCartesianMomentum(float pTheta, float pOmega, float pPhi, float pAlpha, float pLength) {
-        float xDot = pLength * (pOmega * Mathf.Cos(pTheta) * Mathf.Cos(pPhi) - pAlpha * Mathf.Sin(pTheta) * Mathf.Sin(pPhi));
-        float yDot = pLength * pOmega * Mathf.Sin(pTheta);
-        float zDot = pLength * (pOmega * Mathf.Cos(pTheta) * Mathf.Sin(pPhi) + pAlpha * Mathf.Sin(pTheta) * Mathf.Cos(pPhi));
+    private (float, float, float) GetCartesianMomentum(float pTheta, float pOmega, float pPhi, float pAlpha, float pLength, float pLengthDot) {
+        float xDot = pLength * (pOmega * Mathf.Cos(pTheta) * Mathf.Cos(pPhi) - pAlpha * Mathf.Sin(pTheta) * Mathf.Sin(pPhi)) + pLengthDot * Mathf.Sin(pTheta) * Mathf.Cos(pPhi);
+        float yDot = pLength * pOmega * Mathf.Sin(pTheta) - pLengthDot * Mathf.Cos(pTheta);
+        float zDot = pLength * (pOmega * Mathf.Cos(pTheta) * Mathf.Sin(pPhi) + pAlpha * Mathf.Sin(pTheta) * Mathf.Cos(pPhi)) + pLengthDot * Mathf.Sin(pTheta) * Mathf.Sin(pPhi);
         return (xDot, yDot, zDot);
     }
 
@@ -158,14 +158,17 @@ public class Player : MonoBehaviour {
         float length = state[4];
         float lengthDot = state[5];
 
+        // theta
         if (length < epsilon) { length = epsilon; }
-        thetaDdot = Mathf.Sin(theta) * (Mathf.Cos(theta) * omega * omega - gravity / length) - damping * omega;
+        thetaDdot = Mathf.Sin(theta) * (Mathf.Cos(theta) * alpha * alpha - gravity / length) - damping * omega - 2 * omega * lengthDot / length;
 
+        // phi
         float dividant = Mathf.Tan(theta);
-        if (Mathf.Abs(dividant) > epsilon) { phiDdot = -alpha * (damping + 2 * omega / dividant); }
-        else { phiDdot = 0; }
+        if (Mathf.Abs(dividant) > epsilon) { phiDdot = -2 * alpha * lengthDot / length - 2 * alpha * omega / dividant; }
+        else { phiDdot = 0; alpha = 0; }
 
-        lengthDDot = gravity * Mathf.Cos(theta) + k * (naturalLength - length) + length * omega * omega * Mathf.Sin(phi) + length * alpha * alpha;
+        // length
+        lengthDDot = omega * omega + alpha * alpha * Mathf.Sin(theta) * Mathf.Sin(theta) + gravity * Mathf.Cos(theta) / length - k * (1 - naturalLength / length);
 
         return new float[] { omega, thetaDdot, alpha, phiDdot, lengthDot, lengthDDot };
     }

@@ -693,7 +693,7 @@ Transform:
   m_GameObject: {fileID: 873126558}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 40, z: -10}
+  m_LocalPosition: {x: 0, y: 15, z: 10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -747,8 +747,8 @@ MonoBehaviour:
   GetInput: {fileID: 599610584}
   mass: 100
   gravity: 9.81
-  damping: 0.01
-  k: 30
+  damping: 0
+  k: 100
   Anchors:
   - {fileID: 972973545}
   - {fileID: 662100310}
