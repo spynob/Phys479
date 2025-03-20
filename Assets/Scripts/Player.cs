@@ -33,7 +33,7 @@ public class Player : MonoBehaviour {
     private float phi; // Azimuthal angle
     private float lengthDot;
     private float omega = 0;
-    private float alpha = 0.5f;
+    private float alpha = 0f;
     private float lengthDDot;
     private float thetaDdot = 0;
     private float phiDdot = 0;
