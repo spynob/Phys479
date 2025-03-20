@@ -799,10 +799,11 @@ MonoBehaviour:
   ParticleInterval: 0.5
   GetInput: {fileID: 599610584}
   mass: 100
-  gravity: 9.81
+  gravity: 98.1
   damping: 10
-  k: 700
+  k: 7000
   InitialStretching: 5
+  IntialVelocity: {x: 0, y: 10}
   Anchors:
   - {fileID: 972973545}
   - {fileID: 662100310}

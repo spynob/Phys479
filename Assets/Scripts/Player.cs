@@ -21,7 +21,7 @@ public class Player : MonoBehaviour {
     public float damping = 0.01f;
     public float k = 1;
     public float InitialStretching = 0;
-
+    public Vector2 IntialVelocity = new Vector2(0, 0);
     // Anchor stuff
     public GameObject[] Anchors;
     private int anchorIndex = 0;
@@ -50,6 +50,7 @@ public class Player : MonoBehaviour {
         GetInput = GetComponent<InputSubscription>();
         damping = damping / mass;
         k = k / mass;
+        (omega, alpha) = (IntialVelocity.x, IntialVelocity.y);
         SaveLength();
         Grapple();
         naturalLength = Mathf.Max(naturalLength - InitialStretching, epsilonLength + epsilonLength * 0.1f);
@@ -133,7 +134,7 @@ public class Player : MonoBehaviour {
             alpha = state[3];
             length = state[4];
             lengthDot = state[5];
-            Debug.Log("Theta: " + theta + ", Omega: " + omega + ", Phi: " + phi + ", Alpha: " + alpha + ", Length: " + length + ", LengthDot: " + lengthDot + ", Natural Length: " + naturalLength);
+            //Debug.Log("Theta: " + theta + ", Omega: " + omega + ", Phi: " + phi + ", Alpha: " + alpha + ", Length: " + length + ", LengthDot: " + lengthDot + ", Natural Length: " + naturalLength);
             transform.position = Anchors[anchorIndex].transform.position + SphericalToCartesian(theta, phi, length);
         }
     }

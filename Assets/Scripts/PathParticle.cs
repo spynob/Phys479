@@ -17,7 +17,7 @@ public class PathParticle : MonoBehaviour {
     // Update is called once per frame
     void Update() {
         timer += Time.deltaTime;
-        if (TimeToLive <= 0) { Destroy(gameObject); return; }
+        if (TimeToLive <= 0) { return; }
         float shrinkFactor = Mathf.Max(0, 1 - (timer / TimeToLive));
         transform.localScale = initalSize * shrinkFactor;
         if (timer >= TimeToLive) {
