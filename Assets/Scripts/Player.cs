@@ -46,10 +46,6 @@ public class Player : MonoBehaviour {
     private float yMom;
     private float zMom;
 
-
-    //thetaDdot = -gravity / length * Mathf.Sin(theta) + Mathf.Sin(theta) * Mathf.Cos(theta) * alpha * alpha - (damping * omega);
-    //phiDdot = -(2 * omega * alpha) / Mathf.Tan(theta) - (damping * alpha);
-
     private void Awake() {
         GetInput = GetComponent<InputSubscription>();
         damping = damping / mass;
