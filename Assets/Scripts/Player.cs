@@ -104,7 +104,7 @@ public class Player : MonoBehaviour {
         float dividant = pLength * Mathf.Sin(pTheta);
         float a;
         if (dividant < epsilon) { a = 0; }
-        else { a = (cartesianMomentum.z * Mathf.Cos(pPhi) - cartesianMomentum.x * Mathf.Sin(pPhi)) / (dividant); }
+        else { a = (cartesianMomentum.z * Mathf.Cos(pPhi) - cartesianMomentum.x * Mathf.Sin(pPhi)) / dividant; }
         return (o, a, ld);
     }
 
