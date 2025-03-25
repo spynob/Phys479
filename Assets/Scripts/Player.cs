@@ -163,7 +163,7 @@ public class Player : MonoBehaviour {
 
         // phi
         float dividant = Mathf.Tan(theta);
-        if (Mathf.Abs(dividant) > epsilon) { phiDdot = -2 * alpha * lengthDot / length - 2 * alpha * omega / dividant; }
+        if (Mathf.Abs(dividant) > epsilon) { phiDdot = -2 * alpha * lengthDot / length - 2 * alpha * omega / dividant - damping * alpha; }
         else { phiDdot = 0; alpha = 0; }
 
         // length
