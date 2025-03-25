@@ -11,6 +11,9 @@ public class Player : MonoBehaviour {
     public GameObject particle;
     public float ParticleInterval = 0.5f;
 
+    // Tether
+    LineDrawer lineDrawer;
+
     // Input Movement
     [SerializeField] InputSubscription GetInput;
     bool Switching = false;
@@ -39,6 +42,7 @@ public class Player : MonoBehaviour {
     private float phiDdot = 0;
     private float epsilon = 0.05f;
     private float epsilonLength = 0.1f;
+    private bool InsideRadius = false;
 
     // Momentum Transfer
     private bool Swinging = true;
@@ -55,20 +59,27 @@ public class Player : MonoBehaviour {
         Grapple();
         naturalLength = Mathf.Max(naturalLength - InitialStretching, epsilonLength + epsilonLength * 0.1f);
         InvokeRepeating(nameof(SpawnParticle), 0f, ParticleInterval);
+        lineDrawer = GameObject.Find("LineDrawer").GetComponent<LineDrawer>();
     }
 
     private void Update() {
         if (GetInput.Swing && !Switching) {
             Debug.Log("SWITCH");
             SwitchAnchor();
+            lineDrawer.setAnchor(null);
             Swinging = false;
             Switching = true;
+            return;
         }
-        if (!GetInput.Swing) { Switching = false; }
-        if (!Swinging) {
+        if (!Swinging || InsideRadius) {
             FreeFall();
-            CheckIsOutRadius();
+            if (!Swinging) { return; }
         }
+
+        lineDrawer.setAnchor(Anchors[anchorIndex].transform);
+        lineDrawer.setStress(length - naturalLength);
+        Switching = false;
+        CheckIsOutRadius();
     }
 
     void FreeFall() {
@@ -79,11 +90,14 @@ public class Player : MonoBehaviour {
     void CheckIsOutRadius() {
         Vector3 relativePos = transform.position - Anchors[anchorIndex].transform.position;
         float distance = relativePos.magnitude;
-        if (distance >= naturalLength) { // update angles and set swinging to true
+        if (epsilonLength <= distance - naturalLength) { // update angles and set swinging to true
             Grapple();
             Swinging = true;
             (omega, alpha, lengthDot) = GetSphericalMomentum(new Vector3(xMom, yMom, zMom), theta, phi, naturalLength);
+            InsideRadius = false;
         }
+        (xMom, yMom, zMom) = GetCartesianMomentum(theta, omega, phi, alpha, length, lengthDot);
+        InsideRadius = true; ;
     }
 
     void SaveLength() {
@@ -92,7 +106,7 @@ public class Player : MonoBehaviour {
     }
 
     void SwitchAnchor() {
-        anchorIndex = Mathf.Min(2, anchorIndex + 1);
+        anchorIndex = Mathf.Min(Anchors.Length - 1, anchorIndex + 1);
         (xMom, yMom, zMom) = GetCartesianMomentum(theta, omega, phi, alpha, length, lengthDot);
         SaveLength();
     }
@@ -125,7 +139,7 @@ public class Player : MonoBehaviour {
     }
 
     void FixedUpdate() {
-        if (Swinging) {
+        if (Swinging && !InsideRadius) {
             float[] state = { theta, omega, phi, alpha, length, lengthDot };
             RungeKuttaStep(Time.fixedDeltaTime, state);
             theta = state[0];

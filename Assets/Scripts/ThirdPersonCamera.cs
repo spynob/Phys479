@@ -8,7 +8,7 @@ public class ThirdPersonCamera : MonoBehaviour {
 
     // Zoom variables
     public float minZoom = 2f;
-    public float maxZoom = 10f;
+    public float maxZoom = 50f;
     public float zoomSpeed = 5f;
     private float currentZoom;
 
@@ -26,7 +26,7 @@ public class ThirdPersonCamera : MonoBehaviour {
 
         yaw += Input.GetAxis("Mouse X") * rotationSpeed;
         pitch -= Input.GetAxis("Mouse Y") * rotationSpeed;
-        pitch = Mathf.Clamp(pitch, -30f, 60f);
+        pitch = Mathf.Clamp(pitch, -75f, 70f);
 
         float scroll = Input.GetAxis("Mouse ScrollWheel");
         currentZoom -= scroll * zoomSpeed;
