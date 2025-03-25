@@ -92,7 +92,7 @@ public class Player : MonoBehaviour {
     }
 
     void SwitchAnchor() {
-        anchorIndex = Mathf.Min(2, anchorIndex + 1);
+        anchorIndex = Mathf.Min(Anchors.Length - 1, anchorIndex + 1);
         (xMom, yMom, zMom) = GetCartesianMomentum(theta, omega, phi, alpha, length, lengthDot);
         SaveLength();
     }
