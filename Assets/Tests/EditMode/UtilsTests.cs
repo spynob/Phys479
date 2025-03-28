@@ -1,24 +1,10 @@
-using System.Collections;
 using NUnit.Framework;
 using UnityEngine;
-using UnityEngine.TestTools;
 
-public class UtilsTests
-{
+public class UtilsTests {
     // A Test behaves as an ordinary method
     [Test]
-    public void UtilsTestsSimplePasses()
-    {
-        // Use the Assert class to test conditions
-    }
-
-    // A UnityTest behaves like a coroutine in Play Mode. In Edit Mode you can use
-    // `yield return null;` to skip a frame.
-    [UnityTest]
-    public IEnumerator UtilsTestsWithEnumeratorPasses()
-    {
-        // Use the Assert class to test conditions.
-        // Use yield to skip a frame.
-        yield return null;
+    public void SphericalToCartesianCoordsCorrect() {
+        Assert.AreEqual(new Vector3(0, -1, 0), Utils.SphericalToCartesianCoords(new Vector3(0, 0, 1)));
     }
 }
