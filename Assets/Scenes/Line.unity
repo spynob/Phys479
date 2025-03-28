@@ -471,7 +471,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7746923b367730a429de8c7f3cd7972c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  DecayTime: 10
+  gravity: 9.81
+  damping: 0.1
+  k: 7000
+  DecayTime: 0
+  epsilon: 0.05
+  epsilonLength: 0.1
 --- !u!4 &599610586
 Transform:
   m_ObjectHideFlags: 0
@@ -852,7 +857,7 @@ Transform:
   m_GameObject: {fileID: 873126558}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 54.5, z: 0.2}
+  m_LocalPosition: {x: 0, y: 54.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -904,12 +909,9 @@ MonoBehaviour:
   particle: {fileID: 4154735860701002386, guid: ff1bb5148e2790a4e9962da00987abd1, type: 3}
   ParticleInterval: 0.5
   GetInput: {fileID: 599610584}
-  mass: 100
-  gravity: 9.81
-  damping: 10
-  k: 7000
+  mass: 10
   InitialStretching: 0
-  IntialVelocity: {x: 0, y: 0}
+  IntialSphericalVelocity: {x: 0, y: 0}
   Anchors:
   - {fileID: 972973545}
   - {fileID: 662100310}
