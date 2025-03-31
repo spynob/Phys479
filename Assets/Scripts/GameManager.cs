@@ -9,7 +9,6 @@ public class GameManager : MonoBehaviour {
     [Header("Environement Variables")]
     public float gravity = 9.81f;
     public float damping = 0.1f;
-    public float k;
     public float DecayTime;
     public float epsilon = 0.05f;
     public float epsilonLength = 1f;
@@ -25,9 +24,8 @@ public class GameManager : MonoBehaviour {
         }
     }
 
-    public void UpdateDampingAndK(float mass) {
+    public void UpdateDamping(float mass) {
         try {
-            k = k / mass;
             damping = damping / mass;
         }
         catch (DivideByZeroException ex) {
