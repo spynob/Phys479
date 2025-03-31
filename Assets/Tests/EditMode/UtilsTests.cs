@@ -6,7 +6,7 @@ public class UtilsTests {
     [Test]
     public void CartesianToSphericalVelocitySpringCorrect() {
         Vector3 expected = new Vector3(3.393f, 2.001f, 0.776457f);
-        Vector3 actual = Utils.CartesianToSphericalVelocitySpring(new Vector3(3, 4, 5), new Vector3(Mathf.PI / 4, Mathf.PI / 6, 2), 0.05f);
+        Vector3 actual = Utils.CartesianToSphericalVelocity(new Vector3(3, 4, 5), new Vector3(Mathf.PI / 4, Mathf.PI / 6, 2), 0.05f);
         float tolerance = 0.01f;
         Debug.Log($"Expected: {expected}, Actual: {actual}, Distance: {Vector3.Distance(expected, actual)}");
         Assert.That(Vector3.Distance(expected, actual), Is.LessThan(tolerance), "Vector mismatch");
@@ -15,7 +15,7 @@ public class UtilsTests {
     [Test]
     public void CartesianToSphericalVelocitySpringLength0() {
         Vector3 expected = new Vector3(0, 0, 0);
-        Vector3 actual = Utils.CartesianToSphericalVelocitySpring(new Vector3(3, 4, 5), new Vector3(Mathf.PI / 4, Mathf.PI / 6, 0), 0.05f);
+        Vector3 actual = Utils.CartesianToSphericalVelocity(new Vector3(3, 4, 5), new Vector3(Mathf.PI / 4, Mathf.PI / 6, 0), 0.05f);
         float tolerance = 0.01f;
         Debug.Log($"Expected: {expected}, Actual: {actual}, Distance: {Vector3.Distance(expected, actual)}");
         Assert.That(Vector3.Distance(expected, actual), Is.LessThan(tolerance), "Vector mismatch");
@@ -23,7 +23,7 @@ public class UtilsTests {
     [Test]
     public void CartesianToSphericalVelocitySpringTheta0() {
         Vector3 expected = new Vector3(2.299f, 0, -4);
-        Vector3 actual = Utils.CartesianToSphericalVelocitySpring(new Vector3(3, 4, 5), new Vector3(0, Mathf.PI / 6, 0), 0.05f);
+        Vector3 actual = Utils.CartesianToSphericalVelocity(new Vector3(3, 4, 5), new Vector3(0, Mathf.PI / 6, 0), 0.05f);
         float tolerance = 0.01f;
         Debug.Log($"Expected: {expected}, Actual: {actual}, Distance: {Vector3.Distance(expected, actual)}");
         Assert.That(Vector3.Distance(expected, actual), Is.LessThan(tolerance), "Vector mismatch");
@@ -33,7 +33,7 @@ public class UtilsTests {
     [Test]
     public void CartesianToSphericalVelocityRigidCorrect() {
         Vector2 expected = new Vector3(3.393f, 2.001f, 2);
-        Vector2 actual = Utils.CartesianToSphericalVelocityRigid(new Vector3(3, 4, 5), new Vector3(Mathf.PI / 4, Mathf.PI / 6, 2), 0.05f);
+        Vector2 actual = Utils.CartesianToSphericalVelocity(new Vector3(3, 4, 5), new Vector3(Mathf.PI / 4, Mathf.PI / 6, 2), 0.05f);
         float tolerance = 0.01f;
         Debug.Log($"Expected: {expected}, Actual: {actual}, Distance: {Vector3.Distance(expected, actual)}");
         Assert.That(Vector3.Distance(expected, actual), Is.LessThan(tolerance), "Vector mismatch");
@@ -42,7 +42,7 @@ public class UtilsTests {
     [Test]
     public void CartesianToSphericalVelocityRigidLength0() {
         Vector2 expected = new Vector3(0, 0, 0);
-        Vector2 actual = Utils.CartesianToSphericalVelocityRigid(new Vector3(3, 4, 5), new Vector3(Mathf.PI / 4, Mathf.PI / 6, 0), 0.05f);
+        Vector2 actual = Utils.CartesianToSphericalVelocity(new Vector3(3, 4, 5), new Vector3(Mathf.PI / 4, Mathf.PI / 6, 0), 0.05f);
         float tolerance = 0.01f;
         Debug.Log($"Expected: {expected}, Actual: {actual}, Distance: {Vector3.Distance(expected, actual)}");
         Assert.That(Vector3.Distance(expected, actual), Is.LessThan(tolerance), "Vector mismatch");
@@ -50,7 +50,7 @@ public class UtilsTests {
     [Test]
     public void CartesianToSphericalVelocityRigidTheta0() {
         Vector2 expected = new Vector3(2.299f, 0, 2);
-        Vector2 actual = Utils.CartesianToSphericalVelocityRigid(new Vector3(3, 4, 5), new Vector3(0, Mathf.PI / 6, 2), 0.05f);
+        Vector2 actual = Utils.CartesianToSphericalVelocity(new Vector3(3, 4, 5), new Vector3(0, Mathf.PI / 6, 2), 0.05f);
         float tolerance = 0.01f;
         Debug.Log($"Expected: {expected}, Actual: {actual}, Distance: {Vector3.Distance(expected, actual)}");
         Assert.That(Vector3.Distance(expected, actual), Is.LessThan(tolerance), "Vector mismatch");
