@@ -4,7 +4,7 @@ public static class Utils {
 
     public static Vector3 FreefallDisplacement(Vector3 cartesianVel, float timeStep) {
         cartesianVel.y -= (GameManager.Instance.gravity + GameManager.Instance.damping * cartesianVel.y) * timeStep;
-        return new Vector3(cartesianVel.x * (1 - GameManager.Instance.damping) * timeStep, cartesianVel.y, cartesianVel.z * (1 - GameManager.Instance.damping) * timeStep);
+        return new Vector3(cartesianVel.x * (1 - GameManager.Instance.damping * timeStep), cartesianVel.y, cartesianVel.z * (1 - GameManager.Instance.damping * timeStep));
     }
 
     // Not sure about this one
@@ -25,7 +25,8 @@ public static class Utils {
         return new Vector3(omega, alpha, lengthDot);
     }
 
-    public static Vector2 CartesianToSphericalVelocityRigid(Vector3 cartesianVelocity, float theta, float phi, float length, float epsilon) {
+    public static Vector2 CartesianToSphericalVelocityRigid(Vector3 cartesianVelocity, Vector3 sphericalCoords, float epsilon) {
+        float theta = sphericalCoords.x; float phi = sphericalCoords.y; float length = sphericalCoords.z;
         float omega = (Mathf.Cos(theta) * (cartesianVelocity.x * Mathf.Cos(phi) + cartesianVelocity.z * Mathf.Sin(phi)) + cartesianVelocity.y * Mathf.Sin(theta)) / length;
         float dividant = length * Mathf.Sin(theta);
         float alpha;
