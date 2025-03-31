@@ -53,7 +53,7 @@ public class Player : MonoBehaviour {
             CartesianVelocity = Utils.SphericalToCartesianVelocity(SphericalVelocity, SphericalCoords);
             SwitchAnchor();
             Grapple();
-            SphericalVelocity = Utils.CartesianToSphericalVelocity(CartesianVelocity, SphericalVelocity);
+            SphericalVelocity = Utils.CartesianToSphericalVelocity(CartesianVelocity, SphericalVelocity, GameManager.Instance.epsilon);
             Switching = true;
             return;
         }
