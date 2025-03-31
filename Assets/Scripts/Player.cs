@@ -39,20 +39,23 @@ public class Player : MonoBehaviour {
         // Very bad, but saves multiple divisions per frame. In the acceleration formulas (see RungeKutta.cs for more info), damping is supposed to be divided by mass, since mass is constant here and there is only one player, I optimized it by doing the division beforehand
         // DO NOT DO THIS IF YOU HAVE MULTIPLE OBJECTS OF VARYING MASS USING THE RUNGEKUTTA APPROX AND REMOVE THE NEXT LINE
         GameManager.Instance.UpdateDamping(mass);
+        lineDrawer = GameObject.Find("LineDrawer").GetComponent<LineDrawer>();
+        InvokeRepeating(nameof(SpawnParticle), 0f, ParticleInterval);
 
         SphericalVelocity = new Vector3(IntialSphericalVelocity.x, IntialSphericalVelocity.y, 0);
         Grapple();
+    }
+    void Start() {
 
-        InvokeRepeating(nameof(SpawnParticle), 0f, ParticleInterval);
-        lineDrawer = GameObject.Find("LineDrawer").GetComponent<LineDrawer>();
     }
 
     private void Update() {
         if (GetInput.Swing && !Switching) {
             Debug.Log("SWITCH");
-            SwitchAnchor();
             CartesianVelocity = Utils.SphericalToCartesianVelocity(SphericalVelocity, SphericalCoords, length);
-            lineDrawer.setAnchor(null);
+            SwitchAnchor();
+            Grapple();
+            SphericalVelocity = Utils.CartesianToSphericalVelocity(CartesianVelocity, SphericalCoords, length, GameManager.Instance.epsilonLength);
             Switching = true;
             return;
         }
@@ -77,7 +80,9 @@ public class Player : MonoBehaviour {
 
     private void Grapple() {
         Vector3 relativePos = transform.position - Anchors[anchorIndex].transform.position;
+        length = relativePos.magnitude;
         SphericalCoords = Utils.RelativeCartesianToSphericalCoords(relativePos, length);
+        lineDrawer.setAnchor(Anchors[anchorIndex].transform);
     }
 
     private void SpawnParticle() {
