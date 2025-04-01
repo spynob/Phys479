@@ -19,7 +19,7 @@ public class Player : MonoBehaviour {
 
     // Properties
     public float mass = 100;
-    public Vector3 IntialSphericalVelocity = new Vector3(0, 0, 0); // (omega, alpha, stretching)
+    public Vector3 InitialSphericalVelocity = new Vector3(0, 0, 0); // (omega, alpha, stretching)
 
     // Anchor stuff
     public GameObject[] Anchors;
@@ -43,7 +43,7 @@ public class Player : MonoBehaviour {
         lineDrawer = GameObject.Find("LineDrawer").GetComponent<LineDrawer>();
         lineDrawer.setAnchor(Anchors[anchorIndex].transform);
 
-        SphericalVelocity = new Vector3(IntialSphericalVelocity.x, IntialSphericalVelocity.y, 0);
+        SphericalVelocity = new Vector3(InitialSphericalVelocity.x, InitialSphericalVelocity.y, InitialSphericalVelocity.z);
         Grapple();
         naturalLength = Mathf.Max(naturalLength - SphericalCoords.z, GameManager.Instance.epsilonLength * 1.1f);
     }
@@ -71,7 +71,7 @@ public class Player : MonoBehaviour {
             float[] state = { SphericalCoords.x, SphericalVelocity.x, SphericalCoords.y, SphericalVelocity.y, SphericalCoords.z, SphericalVelocity.z };
             state = RungeKutta.Step(Time.fixedDeltaTime, state, naturalLength);
             ParseState(state);
-            //Debug.Log("Theta: " + theta + ", Omega: " + omega + ", Phi: " + phi + ", Alpha: " + alpha + ", Length: " + length + ", LengthDot: " + lengthDot + ", Natural Length: " + naturalLength);
+            Debug.Log("Coords: " + SphericalCoords + ", Velocity: " + SphericalVelocity + "natural length: " + naturalLength);
             transform.position = Anchors[anchorIndex].transform.position + Utils.SphericalToCartesianCoords(SphericalCoords);
         }
         else {
