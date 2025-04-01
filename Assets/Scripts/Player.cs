@@ -19,8 +19,7 @@ public class Player : MonoBehaviour {
 
     // Properties
     public float mass = 100;
-    public float InitialStretching = 0;
-    public Vector2 IntialSphericalVelocity = new Vector2(0, 0); // (omega, alpha)
+    public Vector3 IntialSphericalVelocity = new Vector3(0, 0, 0); // (omega, alpha, stretching)
 
     // Anchor stuff
     public GameObject[] Anchors;
@@ -32,7 +31,6 @@ public class Player : MonoBehaviour {
     private Vector3 SphericalVelocity; // (omega [thetaDot], alpha [phiDot], lengthDot)
     private Vector3 SphericalAcc; // (omegaDot [thetaDotDot], alphaDot [phiDOtDot], lengthDotDot)
     private Vector3 CartesianVelocity; // (xDot, yDot, zDot)
-    private bool InsideRadius = false;
     bool Switching = false;
 
     private void Awake() {
@@ -41,19 +39,18 @@ public class Player : MonoBehaviour {
         // Very bad, but saves multiple divisions per frame. In the acceleration formulas (see RungeKutta.cs for more info), k and damping are supposed to be divided by mass, since mass is constant here and there is only one player, I optimized it by doing the division beforehand
         // DO NOT DO THIS IF YOU HAVE MULTIPLE OBJECTS OF VARYING MASS USING THE RUNGEKUTTA APPROX AND REMOVE THE NEXT LINE
         GameManager.Instance.UpdateDampingAndK(mass);
+        InvokeRepeating(nameof(SpawnParticle), 0f, ParticleInterval);
+        lineDrawer = GameObject.Find("LineDrawer").GetComponent<LineDrawer>();
+        lineDrawer.setAnchor(Anchors[anchorIndex].transform);
 
         SphericalVelocity = new Vector3(IntialSphericalVelocity.x, IntialSphericalVelocity.y, 0);
         Grapple();
-        naturalLength = Mathf.Max(naturalLength - InitialStretching, GameManager.Instance.epsilonLength * 1.1f);
-
-        InvokeRepeating(nameof(SpawnParticle), 0f, ParticleInterval);
-        lineDrawer = GameObject.Find("LineDrawer").GetComponent<LineDrawer>();
+        naturalLength = Mathf.Max(naturalLength - SphericalCoords.z, GameManager.Instance.epsilonLength * 1.1f);
     }
 
     private void Update() {
         if (GetInput.Swing && !Switching) {
             Debug.Log("SWITCH");
-            SwitchAnchor();
             CartesianVelocity = Utils.SphericalToCartesianVelocity(SphericalVelocity, SphericalCoords);
             lineDrawer.setAnchor(null);
             Switching = true;
@@ -61,15 +58,16 @@ public class Player : MonoBehaviour {
         }
         else if (!GetInput.Swing && Switching) {
             Switching = false;
+            SwitchAnchor();
+            Grapple();
+            SphericalVelocity = Utils.CartesianToSphericalVelocity(CartesianVelocity, SphericalCoords, GameManager.Instance.epsilon);
             lineDrawer.setAnchor(Anchors[anchorIndex].transform);
-            SaveLength();
         }
         lineDrawer.setStress(SphericalCoords.z - naturalLength);
-        CheckRadius();
     }
 
     void FixedUpdate() {
-        if (!Switching && !InsideRadius) {
+        if (!Switching) {
             float[] state = { SphericalCoords.x, SphericalVelocity.x, SphericalCoords.y, SphericalVelocity.y, SphericalCoords.z, SphericalVelocity.z };
             state = RungeKutta.Step(Time.fixedDeltaTime, state, naturalLength);
             ParseState(state);
@@ -77,35 +75,12 @@ public class Player : MonoBehaviour {
             transform.position = Anchors[anchorIndex].transform.position + Utils.SphericalToCartesianCoords(SphericalCoords);
         }
         else {
-            transform.position += Utils.FreefallDisplacement(CartesianVelocity, Time.fixedDeltaTime);
-        }
-    }
-
-    void CheckRadius() {
-        Vector3 relativePos = transform.position - Anchors[anchorIndex].transform.position;
-        float distance = relativePos.magnitude;
-
-        if (distance - naturalLength >= -GameManager.Instance.epsilonLength) // outside Radius
-        {
-            if (!InsideRadius) { return; }
-            SphericalCoords = Utils.RelativeCartesianToSphericalCoords(relativePos);
-            SphericalVelocity = Utils.CartesianToSphericalVelocitySpring(CartesianVelocity, SphericalCoords, GameManager.Instance.epsilon);
-            InsideRadius = false;
-        }
-        else { // inside radius
-            if (InsideRadius) { return; }
-            CartesianVelocity = Utils.SphericalToCartesianVelocity(SphericalVelocity, SphericalCoords);
-            InsideRadius = true;
+            transform.position += Utils.FreefallDisplacement(CartesianVelocity, Time.fixedDeltaTime) * Time.fixedDeltaTime;
         }
     }
 
     void SwitchAnchor() {
         anchorIndex = Mathf.Min(Anchors.Length - 1, anchorIndex + 1);
-    }
-
-    void SaveLength() {
-        Vector3 relativePos = transform.position - Anchors[anchorIndex].transform.position;
-        naturalLength = relativePos.magnitude;
     }
 
     private void Grapple() {
