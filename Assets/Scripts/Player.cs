@@ -32,6 +32,7 @@ public class Player : MonoBehaviour {
     private Vector3 SphericalAcc; // (omegaDot [thetaDotDot], alphaDot [phiDOtDot], lengthDotDot)
     private Vector3 CartesianVelocity; // (xDot, yDot, zDot)
     bool Switching = false;
+    bool FreeFalling = false;
 
     private void Awake() {
         GetInput = GetComponent<InputSubscription>();
@@ -61,11 +62,19 @@ public class Player : MonoBehaviour {
             Grapple();
             SphericalVelocity = Utils.CartesianToSphericalVelocity(CartesianVelocity, SphericalCoords, GameManager.Instance.epsilon);
         }
-        lineDrawer.setStress(SphericalCoords.z - naturalLength);
+        if (SphericalCoords.z + GameManager.Instance.epsilonLength < naturalLength && !FreeFalling) {
+            FreeFalling = true;
+            CartesianVelocity = Utils.SphericalToCartesianVelocity(SphericalVelocity, SphericalCoords);
+        }
+        else if (SphericalCoords.z >= naturalLength && FreeFalling) {
+            FreeFalling = false;
+            SphericalCoords = Utils.RelativeCartesianToSphericalCoords(transform.position - Anchors[anchorIndex].transform.position);
+            SphericalVelocity = Utils.CartesianToSphericalVelocity(CartesianVelocity, SphericalCoords, GameManager.Instance.epsilon);
+        }
     }
 
     void FixedUpdate() {
-        if (!Switching) {
+        if (!FreeFalling) {
             float[] state = { SphericalCoords.x, SphericalVelocity.x, SphericalCoords.y, SphericalVelocity.y, SphericalCoords.z, SphericalVelocity.z };
             state = RungeKutta.Step(Time.fixedDeltaTime, state, naturalLength);
             ParseState(state);
