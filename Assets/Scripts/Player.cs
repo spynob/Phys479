@@ -50,10 +50,12 @@ public class Player : MonoBehaviour {
     private void Update() {
         if (GetInput.Swing && !Switching) {
             Debug.Log("SWITCH");
+            Debug.Log("Coords: " + SphericalCoords + ", Velocities: " + SphericalVelocity + ", Natural Length: " + naturalLength);
             CartesianVelocity = Utils.SphericalToCartesianVelocity(SphericalVelocity, SphericalCoords);
             SwitchAnchor();
             Grapple();
             SphericalVelocity = Utils.CartesianToSphericalVelocity(CartesianVelocity, SphericalVelocity, GameManager.Instance.epsilon);
+            Debug.Log("Coords: " + SphericalCoords + ", Velocities: " + SphericalVelocity + ", Natural Length: " + naturalLength);
             Switching = true;
             return;
         }
@@ -91,11 +93,20 @@ public class Player : MonoBehaviour {
     }
 
     private void ParseState(float[] state) {
-        SphericalCoords.x = state[0];
-        SphericalVelocity.x = state[1];
-        SphericalCoords.y = state[2];
-        SphericalVelocity.y = state[3];
-        SphericalCoords.z = state[4];
-        SphericalVelocity.z = state[5];
+        SphericalCoords.x = CleanFloat(state[0]);
+        SphericalVelocity.x = CleanFloat(state[1]);
+        SphericalCoords.y = CleanFloat(state[2]);
+        SphericalVelocity.y = CleanFloat(state[3]);
+        SphericalCoords.z = CleanFloat(state[4]);
+        SphericalVelocity.z = CleanFloat(state[5]);
+    }
+
+    private float CleanFloat(float value) {
+        if (-GameManager.Instance.epsilon <= value && value <= GameManager.Instance.epsilon) {
+            return 0;
+        }
+        else {
+            return value;
+        }
     }
 }
