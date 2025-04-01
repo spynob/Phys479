@@ -41,7 +41,6 @@ public class Player : MonoBehaviour {
         GameManager.Instance.UpdateDampingAndK(mass);
         InvokeRepeating(nameof(SpawnParticle), 0f, ParticleInterval);
         lineDrawer = GameObject.Find("LineDrawer").GetComponent<LineDrawer>();
-        lineDrawer.setAnchor(Anchors[anchorIndex].transform);
 
         SphericalVelocity = new Vector3(InitialSphericalVelocity.x, InitialSphericalVelocity.y, InitialSphericalVelocity.z);
         Grapple();
@@ -61,7 +60,6 @@ public class Player : MonoBehaviour {
             SwitchAnchor();
             Grapple();
             SphericalVelocity = Utils.CartesianToSphericalVelocity(CartesianVelocity, SphericalCoords, GameManager.Instance.epsilon);
-            lineDrawer.setAnchor(Anchors[anchorIndex].transform);
         }
         lineDrawer.setStress(SphericalCoords.z - naturalLength);
     }
@@ -87,6 +85,7 @@ public class Player : MonoBehaviour {
         Vector3 relativePos = transform.position - Anchors[anchorIndex].transform.position;
         naturalLength = Mathf.Max(relativePos.magnitude, GameManager.Instance.epsilonLength);
         SphericalCoords = Utils.RelativeCartesianToSphericalCoords(relativePos);
+        lineDrawer.setAnchor(Anchors[anchorIndex].transform);
     }
 
     private void SpawnParticle() {
