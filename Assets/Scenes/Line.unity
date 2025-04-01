@@ -473,9 +473,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gravity: 9.81
   damping: 0.1
-  k: 7000
   DecayTime: 0
-  epsilon: 0.05
+  epsilon: 0.0005
   epsilonLength: 0.1
 --- !u!4 &599610586
 Transform:
@@ -857,7 +856,7 @@ Transform:
   m_GameObject: {fileID: 873126558}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 54.5, z: 0}
+  m_LocalPosition: {x: 6.5, y: 48.21, z: 1.08}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -910,7 +909,6 @@ MonoBehaviour:
   ParticleInterval: 0.5
   GetInput: {fileID: 599610584}
   mass: 10
-  InitialStretching: 0
   IntialSphericalVelocity: {x: 0, y: 0}
   Anchors:
   - {fileID: 972973545}
