@@ -32,14 +32,14 @@ public static class RungeKutta {
 
         // phi
         float dividant = Mathf.Tan(theta);
-        float phiDot;
-        if (Mathf.Abs(dividant) > GameManager.Instance.epsilon) { phiDot = -2 * alpha * lengthDot / length - 2 * alpha * omega / dividant; }
-        else { phiDot = 0; alpha = 0; }
+        float alphaDot;
+        if (Mathf.Abs(dividant) > GameManager.Instance.epsilon) { alphaDot = -2 * alpha * lengthDot / length - 2 * alpha * omega / dividant - GameManager.Instance.damping * alpha; }
+        else { alphaDot = 0; alpha = 0; }
 
         // length
-        float lengthDotDot = omega * omega + alpha * alpha * Mathf.Sin(theta) * Mathf.Sin(theta) + GameManager.Instance.gravity * Mathf.Cos(theta) / length - GameManager.Instance.k * (1 - naturalLength / length) - GameManager.Instance.damping * lengthDot;
+        float lengthDotDot = omega * omega + alpha * alpha * Mathf.Sin(theta) * Mathf.Sin(theta) + GameManager.Instance.gravity * (1 - Mathf.Cos(theta)) / length - GameManager.Instance.k * (1 - naturalLength / length) - GameManager.Instance.damping * lengthDot;
 
-        return new float[] { omega, omegaDot, alpha, phiDot, lengthDot, lengthDotDot };
+        return new float[] { omega, omegaDot, alpha, alphaDot, lengthDot, lengthDotDot };
     }
 
     private static float[] AddVectors(float[] a, float[] b) {
