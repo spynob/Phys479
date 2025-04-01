@@ -93,12 +93,12 @@ public class Player : MonoBehaviour {
     }
 
     private void ParseState(float[] state) {
-        SphericalCoords.x = CleanFloat(state[0]);
-        SphericalVelocity.x = CleanFloat(state[1]);
-        SphericalCoords.y = CleanFloat(state[2]);
-        SphericalVelocity.y = CleanFloat(state[3]);
-        SphericalCoords.z = CleanFloat(state[4]);
-        SphericalVelocity.z = CleanFloat(state[5]);
+        SphericalCoords.x = state[0];
+        SphericalVelocity.x = state[1];
+        SphericalCoords.y = state[2];
+        SphericalVelocity.y = state[3];
+        SphericalCoords.z = state[4];
+        SphericalVelocity.z = state[5];
     }
 
     private float CleanFloat(float value) {

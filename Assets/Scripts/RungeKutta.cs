@@ -37,7 +37,7 @@ public static class RungeKutta {
         else { phiDot = 0; alpha = 0; }
 
         // length
-        float lengthDotDot = omega * omega + alpha * alpha * Mathf.Sin(theta) * Mathf.Sin(theta) + GameManager.Instance.gravity * (1 - Mathf.Cos(theta)) / length - GameManager.Instance.k * (1 - naturalLength / length) - GameManager.Instance.damping * lengthDot;
+        float lengthDotDot = length * (omega * omega + alpha * alpha * Mathf.Sin(theta) * Mathf.Sin(theta)) + GameManager.Instance.gravity * (1 - Mathf.Cos(theta)) - GameManager.Instance.k * (length - naturalLength) - GameManager.Instance.damping * lengthDot;
 
         return new float[] { omega, omegaDot, alpha, phiDot, lengthDot, lengthDotDot };
     }
