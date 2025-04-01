@@ -2,7 +2,7 @@ using UnityEngine;
 
 public static class Utils {
 
-    public static Vector3 FreefallDisplacement(Vector3 cartesianVel, float timeStep) {
+    public static Vector3 FreefallVelocityUpdate(Vector3 cartesianVel, float timeStep) {
         cartesianVel.y -= (GameManager.Instance.gravity + GameManager.Instance.damping * cartesianVel.y) * timeStep;
         return new Vector3(cartesianVel.x * (1 - GameManager.Instance.damping * timeStep), cartesianVel.y, cartesianVel.z * (1 - GameManager.Instance.damping * timeStep));
     }

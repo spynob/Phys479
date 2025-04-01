@@ -73,7 +73,8 @@ public class Player : MonoBehaviour {
             transform.position = Anchors[anchorIndex].transform.position + Utils.SphericalToCartesianCoords(SphericalCoords);
         }
         else {
-            transform.position += Utils.FreefallDisplacement(CartesianVelocity, Time.fixedDeltaTime) * Time.fixedDeltaTime;
+            CartesianVelocity = Utils.FreefallVelocityUpdate(CartesianVelocity, Time.fixedDeltaTime);
+            transform.position += CartesianVelocity * Time.fixedDeltaTime;
         }
     }
 
