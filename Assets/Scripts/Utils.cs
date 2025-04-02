@@ -2,7 +2,7 @@ using UnityEngine;
 
 public static class Utils {
 
-    public static Vector3 FreefallVelocityUpdate(Vector3 cartesianVel, float timeStep) {
+    public static Vector3 FreefallDisplacement(Vector3 cartesianVel, float timeStep) {
         cartesianVel.y -= (GameManager.Instance.gravity + GameManager.Instance.damping * cartesianVel.y) * timeStep;
         return new Vector3(cartesianVel.x * (1 - GameManager.Instance.damping * timeStep), cartesianVel.y, cartesianVel.z * (1 - GameManager.Instance.damping * timeStep));
     }
@@ -14,11 +14,11 @@ public static class Utils {
         }
         float theta = sphericalCoords.x; float phi = sphericalCoords.y; float length = sphericalCoords.z;
 
-        float lengthDot = Mathf.Sin(theta) * (cartesianVelocity.x * Mathf.Cos(phi) + cartesianVelocity.z * Mathf.Sin(phi)) - cartesianVelocity.y * Mathf.Cos(theta);
+        float lengthDot = Mathf.Cos(theta) * (cartesianVelocity.x * Mathf.Cos(phi) + cartesianVelocity.z * Mathf.Sin(phi)) - cartesianVelocity.y * Mathf.Sin(theta);
 
         float omega;
         if (length <= epsilon) { omega = 0; }
-        else { omega = (Mathf.Cos(theta) * (cartesianVelocity.x * Mathf.Cos(phi) + cartesianVelocity.z * Mathf.Sin(phi)) + cartesianVelocity.y * Mathf.Sin(theta)) / length; }
+        else { omega = (Mathf.Sin(theta) * (cartesianVelocity.x * Mathf.Cos(phi) + cartesianVelocity.z * Mathf.Sin(phi)) + cartesianVelocity.y * Mathf.Cos(theta)) / length; }
 
         float dividant = length * Mathf.Sin(theta);
         float alpha;
@@ -30,11 +30,11 @@ public static class Utils {
 
     public static Vector2 CartesianToSphericalVelocity(Vector3 cartesianVelocity, Vector2 sphericalCoords, float length, float epsilon) {
         float theta = sphericalCoords.x; float phi = sphericalCoords.y;
-        float omega = (Mathf.Cos(theta) * (cartesianVelocity.x * Mathf.Cos(phi) + cartesianVelocity.z * Mathf.Sin(phi)) + cartesianVelocity.y * Mathf.Sin(theta)) / length;
+        float omega = (Mathf.Sin(theta) * (cartesianVelocity.x * Mathf.Cos(phi) + cartesianVelocity.z * Mathf.Sin(phi)) + cartesianVelocity.y * Mathf.Cos(theta)) / length;
         float dividant = length * Mathf.Sin(theta);
         float alpha;
         if (dividant < epsilon) { alpha = 0; }
-        else { alpha = (cartesianVelocity.z * Mathf.Cos(phi) - cartesianVelocity.x * Mathf.Sin(phi)) / dividant; }
+        else { alpha = (cartesianVelocity.z * Mathf.Cos(phi) - cartesianVelocity.x * Mathf.Sin(phi)) / (length * Mathf.Sin(theta)); }
         return new Vector2(omega, alpha);
     }
 
@@ -77,12 +77,11 @@ public static class Utils {
     }
 
     public static Vector3 RelativeCartesianToSphericalCoords(Vector3 relativeCoords) {
-        float length = relativeCoords.magnitude;
-        if (length < GameManager.Instance.epsilonLength) { new Vector3(0, 0, GameManager.Instance.epsilonLength); }
-        return new Vector3(Mathf.Acos(-relativeCoords.y / length), Mathf.Atan2(relativeCoords.z, relativeCoords.x), length);
+        if (relativeCoords.z < GameManager.Instance.epsilonLength) { new Vector3(0, 0, GameManager.Instance.epsilonLength); }
+        return new Vector3(Mathf.Acos(-relativeCoords.y / relativeCoords.z), Mathf.Atan2(relativeCoords.z, relativeCoords.x), relativeCoords.z);
     }
     public static Vector2 RelativeCartesianToSphericalCoords(Vector3 relativeCoords, float length) {
         if (length < GameManager.Instance.epsilonLength) { new Vector3(0, 0, GameManager.Instance.epsilonLength); }
-        return new Vector3(Mathf.Acos(-relativeCoords.y / length), Mathf.Atan2(relativeCoords.z, relativeCoords.x));
+        return new Vector2(Mathf.Acos(-relativeCoords.y / length), Mathf.Atan2(relativeCoords.z, relativeCoords.x));
     }
 }
