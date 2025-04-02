@@ -18,7 +18,7 @@ public static class Utils {
 
         float omega;
         if (length <= epsilon) { omega = 0; }
-        else { omega = (Mathf.Cos(theta) * (cartesianVelocity.x * Mathf.Cos(phi) + cartesianVelocity.z * Mathf.Sin(phi)) + cartesianVelocity.y * Mathf.Sin(theta)) / length; }
+        else { omega = (Mathf.Cos(theta) * (cartesianVelocity.x * Mathf.Cos(phi) + cartesianVelocity.z * Mathf.Sin(phi)) + cartesianVelocity.y * Mathf.Cos(theta)) / length; }
 
         float dividant = length * Mathf.Sin(theta);
         float alpha;
@@ -30,7 +30,7 @@ public static class Utils {
 
     public static Vector2 CartesianToSphericalVelocity(Vector3 cartesianVelocity, Vector2 sphericalCoords, float length, float epsilon) {
         float theta = sphericalCoords.x; float phi = sphericalCoords.y;
-        float omega = (Mathf.Cos(theta) * (cartesianVelocity.x * Mathf.Cos(phi) + cartesianVelocity.z * Mathf.Sin(phi)) + cartesianVelocity.y * Mathf.Sin(theta)) / length;
+        float omega = (Mathf.Cos(theta) * (cartesianVelocity.x * Mathf.Cos(phi) + cartesianVelocity.z * Mathf.Sin(phi)) + cartesianVelocity.y * Mathf.Cos(theta)) / length;
         float dividant = length * Mathf.Sin(theta);
         float alpha;
         if (dividant < epsilon) { alpha = 0; }
