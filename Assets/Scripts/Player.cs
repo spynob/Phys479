@@ -70,7 +70,7 @@ public class Player : MonoBehaviour {
             float[] state = { SphericalCoords.x, SphericalVelocity.x, SphericalCoords.y, SphericalVelocity.y, SphericalCoords.z, SphericalVelocity.z };
             state = RungeKutta.Step(Time.fixedDeltaTime, state, naturalLength);
             ParseState(state);
-            //Debug.Log("Theta: " + theta + ", Omega: " + omega + ", Phi: " + phi + ", Alpha: " + alpha + ", Length: " + length + ", LengthDot: " + lengthDot + ", Natural Length: " + naturalLength);
+            Debug.Log("Spherical Velocity: " + SphericalVelocity + ", Spherical Coords: " + SphericalCoords + ", Natural Length: " + naturalLength);
             transform.position = Anchors[anchorIndex].transform.position + Utils.SphericalToCartesianCoords(SphericalCoords);
         }
     }
