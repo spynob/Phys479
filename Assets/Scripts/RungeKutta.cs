@@ -29,11 +29,11 @@ public static class RungeKutta {
 
         // phi
         float dividant = Mathf.Tan(theta);
-        float phiDot;
-        if (Mathf.Abs(dividant) > GameManager.Instance.epsilon) { phiDot = -2 * alpha * omega / dividant; }
-        else { phiDot = 0; alpha = 0; }
+        float alphaDot;
+        if (Mathf.Abs(dividant) > GameManager.Instance.epsilon) { alphaDot = -2 * alpha * omega / dividant; }
+        else { alphaDot = 0; alpha = 0; }
 
-        return new float[] { omega, omegaDot, alpha, phiDot };
+        return new float[] { omega, omegaDot, alpha, alphaDot };
     }
 
     private static float[] AddVectors(float[] a, float[] b) {
