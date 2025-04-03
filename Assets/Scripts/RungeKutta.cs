@@ -21,11 +21,11 @@ public static class RungeKutta {
 
 
         /*
-        Here damping and k are supposed to be divided by mass. However, I only have one player of constant mass using these equations. Therefore I divided the variables by the mass before hand (See Player.cs)
-        IF YOU ARE USING VARYING MASS, REMOVE THE CALL OF UpdateDampingAndK(mass) IN Plyaer.cs AND DIVIDE EACH APPEARANCE OF damping OR k IN THE FOLLOWING LINES BY THE APPROPRIATE MASS
+        Here damping is supposed to be divided by mass. However, I only have one player of constant mass using these equations. Therefore I divided damping by the mass before hand (See Player.cs)
+        IF YOU ARE USING VARYING MASS, REMOVE THE CALL OF UpdateDamping(mass) IN Plyaer.cs AND DIVIDE EACH APPEARANCE OF damping IN THE FOLLOWING LINES BY THE APPROPRIATE TERM "damping/mass"
         */
         // theta
-        float omegaDot = Mathf.Sin(theta) * (Mathf.Cos(theta) * alpha * alpha - GameManager.Instance.gravity / length) - GameManager.Instance.damping * omega;
+        float omegaDot = Mathf.Sin(theta) * (Mathf.Cos(theta) * alpha * alpha - GameManager.Instance.gravity / length);
 
         // phi
         float dividant = Mathf.Tan(theta);
