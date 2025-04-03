@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public static class Utils {
 
@@ -78,10 +79,16 @@ public static class Utils {
 
     public static Vector3 RelativeCartesianToSphericalCoords(Vector3 relativeCoords) {
         if (relativeCoords.z < GameManager.Instance.epsilonLength) { new Vector3(0, 0, GameManager.Instance.epsilonLength); }
-        return new Vector3(Mathf.Acos(-relativeCoords.y / relativeCoords.z), Mathf.Atan2(relativeCoords.z, relativeCoords.x), relativeCoords.z);
+        return new Vector3(Mathf.Acos(-relativeCoords.y / relativeCoords.magnitude), Mathf.Atan2(relativeCoords.z, relativeCoords.x), relativeCoords.magnitude);
     }
     public static Vector2 RelativeCartesianToSphericalCoords(Vector3 relativeCoords, float length) {
         if (length < GameManager.Instance.epsilonLength) { new Vector3(0, 0, GameManager.Instance.epsilonLength); }
         return new Vector2(Mathf.Acos(-relativeCoords.y / length), Mathf.Atan2(relativeCoords.z, relativeCoords.x));
+    }
+
+    public static bool IsRadialMovementOutwardRigid(Vector2 sphericalCoords, Vector2 sphericalVelocity) {
+        float verticalAcc = (sphericalVelocity.x * sphericalVelocity.x + sphericalVelocity.y * sphericalVelocity.y + GameManager.Instance.gravity * Mathf.Cos(sphericalCoords.x)) * Mathf.Cos(sphericalCoords.x);
+        Debug.Log(verticalAcc);
+        return sphericalVelocity.x * sphericalVelocity.x + sphericalVelocity.y * sphericalVelocity.y + GameManager.Instance.gravity * Mathf.Cos(sphericalCoords.x) > -GameManager.Instance.epsilonLength;
     }
 }

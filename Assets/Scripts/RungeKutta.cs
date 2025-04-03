@@ -33,7 +33,7 @@ public static class RungeKutta {
         // phi
         float dividant = Mathf.Tan(theta);
         float phiDot;
-        if (Mathf.Abs(dividant) > GameManager.Instance.epsilon) { phiDot = -2 * alpha * lengthDot / length - 2 * alpha * omega / dividant; }
+        if (Mathf.Abs(dividant) > GameManager.Instance.epsilon) { phiDot = -2 * alpha * lengthDot / length - 2 * alpha * omega / dividant - GameManager.Instance.damping * alpha; }
         else { phiDot = 0; alpha = 0; }
 
         // length
