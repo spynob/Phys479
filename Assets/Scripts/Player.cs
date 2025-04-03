@@ -61,14 +61,15 @@ public class Player : MonoBehaviour {
             SwitchAnchor();
             Grapple();
             SphericalVelocity = Utils.CartesianToSphericalVelocity(CartesianVelocity, SphericalCoords, length, GameManager.Instance.epsilon);
+            FreeFalling = true;
         }
-        if (IsCentripetalGreaterThanGravity() && !FreeFalling) {
+        if (!Utils.IsRadialMovementOutwardRigid(SphericalCoords, SphericalVelocity) && !FreeFalling) {
             CartesianVelocity = Utils.SphericalToCartesianVelocity(SphericalVelocity, SphericalCoords, length);
             FreeFalling = true;
         }
         else if (Vector3.Distance(transform.position, Anchors[anchorIndex].transform.position) >= length && FreeFalling) {
             FreeFalling = false;
-            SphericalCoords = Utils.RelativeCartesianToSphericalCoords(transform.position - Anchors[anchorIndex].transform.position);
+            SphericalCoords = Utils.RelativeCartesianToSphericalCoords(transform.position - Anchors[anchorIndex].transform.position, length);
             SphericalVelocity = Utils.CartesianToSphericalVelocity(CartesianVelocity, SphericalCoords, length, GameManager.Instance.epsilon);
 
         }
@@ -97,11 +98,6 @@ public class Player : MonoBehaviour {
         length = Mathf.Max(relativePos.magnitude, GameManager.Instance.epsilonLength);
         SphericalCoords = Utils.RelativeCartesianToSphericalCoords(relativePos, length);
         lineDrawer.setAnchor(Anchors[anchorIndex].transform);
-    }
-
-    private bool IsCentripetalGreaterThanGravity() {
-        float CentripetalAccelerationVerticalModule = length * Mathf.Cos(SphericalVelocity.x * SphericalVelocity.x + SphericalVelocity.y * SphericalVelocity.y);
-        return CentripetalAccelerationVerticalModule >= GameManager.Instance.gravity;
     }
 
     private void SpawnParticle() {
