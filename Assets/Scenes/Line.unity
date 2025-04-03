@@ -664,6 +664,37 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &739388640
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 739388641}
+  m_Layer: 0
+  m_Name: FPSCounter
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &739388641
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 739388640}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -99.23121, y: -4.763496, z: 28.492096}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &804297300
 GameObject:
   m_ObjectHideFlags: 0
@@ -910,8 +941,7 @@ MonoBehaviour:
   ParticleInterval: 0.5
   GetInput: {fileID: 599610584}
   mass: 10
-  InitialStretching: 0
-  IntialSphericalVelocity: {x: 0, y: 0}
+  InitialSphericalVelocity: {x: 0, y: 0, z: 0}
   Anchors:
   - {fileID: 972973545}
   - {fileID: 662100310}
@@ -1412,3 +1442,4 @@ SceneRoots:
   - {fileID: 1582039010}
   - {fileID: 41620799}
   - {fileID: 2037169498}
+  - {fileID: 739388641}
