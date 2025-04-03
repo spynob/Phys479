@@ -89,6 +89,6 @@ public static class Utils {
     public static bool IsRadialMovementOutwardRigid(Vector2 sphericalCoords, Vector2 sphericalVelocity) {
         float verticalAcc = (sphericalVelocity.x * sphericalVelocity.x + sphericalVelocity.y * sphericalVelocity.y + GameManager.Instance.gravity * Mathf.Cos(sphericalCoords.x)) * Mathf.Cos(sphericalCoords.x);
         Debug.Log(verticalAcc);
-        return sphericalVelocity.x * sphericalVelocity.x + sphericalVelocity.y * sphericalVelocity.y + GameManager.Instance.gravity * Mathf.Cos(sphericalCoords.x) > -GameManager.Instance.epsilon;
+        return sphericalVelocity.x * sphericalVelocity.x + sphericalVelocity.y * sphericalVelocity.y + GameManager.Instance.gravity * Mathf.Cos(sphericalCoords.x) > -GameManager.Instance.epsilonLength;
     }
 }

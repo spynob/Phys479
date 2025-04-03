@@ -67,7 +67,7 @@ public class Player : MonoBehaviour {
             CartesianVelocity = Utils.SphericalToCartesianVelocity(SphericalVelocity, SphericalCoords, length);
             FreeFalling = true;
         }
-        else if (Vector3.Distance(transform.position, Anchors[anchorIndex].transform.position) >= length && FreeFalling) {
+        else if (Vector3.Distance(transform.position, Anchors[anchorIndex].transform.position) >= length + GameManager.Instance.epsilonLength && FreeFalling) {
             FreeFalling = false;
             SphericalCoords = Utils.RelativeCartesianToSphericalCoords(transform.position - Anchors[anchorIndex].transform.position, length);
             SphericalVelocity = Utils.CartesianToSphericalVelocity(CartesianVelocity, SphericalCoords, length, GameManager.Instance.epsilon);
