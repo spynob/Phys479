@@ -14,13 +14,21 @@ public static class RungeKutta {
         return state;
     }
 
+    static float theta;
+    static float omega;
+    static float alpha;
+    static float length;
+    static float lengthDot;
+    static float sint;
+    static float cost;
     private static float[] Derivatives(float[] state, float naturalLength) {
-        float theta = state[0];
-        float omega = state[1];
-        float alpha = state[3];
-        float length = state[4];
-        float lengthDot = state[5];
-
+        theta = state[0];
+        omega = state[1];
+        alpha = state[3];
+        length = state[4];
+        lengthDot = state[5];
+        sint = Mathf.Sin(theta);
+        cost = Mathf.Cos(theta);
 
         /*
         Here damping and k are supposed to be divided by mass. However, I only have one player of constant mass using these equations. Therefore I divided the variables by the mass before hand (See Player.cs)
@@ -28,18 +36,18 @@ public static class RungeKutta {
         */
         // theta
         if (length < GameManager.Instance.epsilonLength) { length = GameManager.Instance.epsilonLength; }
-        float omegaDot = Mathf.Sin(theta) * (Mathf.Cos(theta) * alpha * alpha - GameManager.Instance.gravity / length) - GameManager.Instance.damping * omega - 2 * omega * lengthDot / length;
+        float omegaDot = sint * (cost * alpha * alpha - GameManager.Instance.gravity / length) - GameManager.Instance.damping * omega - 2 * omega * lengthDot / length;
 
         // phi
-        float dividant = Mathf.Tan(theta);
-        float alphaDot;
-        if (Mathf.Abs(dividant) > GameManager.Instance.epsilon) { alphaDot = -2 * alpha * lengthDot / length - 2 * alpha * omega / dividant - GameManager.Instance.damping * alpha; }
-        else { alphaDot = 0; alpha = 0; }
+        float dividant = sint / cost;
+        float phiDot;
+        if (Mathf.Abs(dividant) > GameManager.Instance.epsilon) { phiDot = -2 * alpha * lengthDot / length - 2 * alpha * omega / dividant - GameManager.Instance.damping * alpha; }
+        else { phiDot = 0; alpha = 0; }
 
         // length
-        float lengthDotDot = omega * omega + alpha * alpha * Mathf.Sin(theta) * Mathf.Sin(theta) + GameManager.Instance.gravity * (1 - Mathf.Cos(theta)) / length - GameManager.Instance.k * (1 - naturalLength / length) - GameManager.Instance.damping * lengthDot;
+        float lengthDotDot = length * (omega * omega + alpha * alpha * sint * sint) + GameManager.Instance.gravity * cost - GameManager.Instance.k * (length - naturalLength) - GameManager.Instance.damping * lengthDot;
 
-        return new float[] { omega, omegaDot, alpha, alphaDot, lengthDot, lengthDotDot };
+        return new float[] { omega, omegaDot, alpha, phiDot, lengthDot, lengthDotDot };
     }
 
     private static float[] AddVectors(float[] a, float[] b) {
