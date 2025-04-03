@@ -30,7 +30,7 @@ public static class RungeKutta {
         // phi
         float dividant = Mathf.Tan(theta);
         float alphaDot;
-        if (Mathf.Abs(dividant) > GameManager.Instance.epsilon) { alphaDot = -2 * alpha * omega / dividant; }
+        if (Mathf.Abs(dividant) > GameManager.Instance.epsilon) { alphaDot = -2 * alpha * omega / dividant - GameManager.Instance.damping * alpha; }
         else { alphaDot = 0; alpha = 0; }
 
         return new float[] { omega, omegaDot, alpha, alphaDot };
