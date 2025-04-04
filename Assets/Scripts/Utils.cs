@@ -13,29 +13,30 @@ public static class Utils {
         if (sphericalCoords.z == 0) {
             throw new System.ArgumentException("Length must be non-zero! This may be a cast from Vector2.");
         }
-        float theta = sphericalCoords.x; float phi = sphericalCoords.y; float length = sphericalCoords.z;
+        float length = sphericalCoords.z;
+        float cost = Mathf.Cos(sphericalCoords.x); float sint = Mathf.Sin(sphericalCoords.x); float cosp = Mathf.Cos(sphericalCoords.y); float sinp = Mathf.Sin(sphericalCoords.y);
 
-        float lengthDot = Mathf.Cos(theta) * (cartesianVelocity.x * Mathf.Cos(phi) + cartesianVelocity.z * Mathf.Sin(phi)) - cartesianVelocity.y * Mathf.Sin(theta);
+        float lengthDot = cost * (cartesianVelocity.x * cosp + cartesianVelocity.z * sinp) - cartesianVelocity.y * sint;
 
         float omega;
         if (length <= epsilon) { omega = 0; }
-        else { omega = (Mathf.Sin(theta) * (cartesianVelocity.x * Mathf.Cos(phi) + cartesianVelocity.z * Mathf.Sin(phi)) + cartesianVelocity.y * Mathf.Cos(theta)) / length; }
+        else { omega = (sint * (cartesianVelocity.x * cosp + cartesianVelocity.z * sinp) + cartesianVelocity.y * cost) / length; }
 
-        float dividant = length * Mathf.Sin(theta);
+        float dividant = length * sint;
         float alpha;
         if (dividant < epsilon) { alpha = 0; }
-        else { alpha = (cartesianVelocity.z * Mathf.Cos(phi) - cartesianVelocity.x * Mathf.Sin(phi)) / (length * Mathf.Sin(theta)); }
+        else { alpha = (cartesianVelocity.z * cosp - cartesianVelocity.x * sinp) / (length * sint); }
 
         return new Vector3(omega, alpha, lengthDot);
     }
 
     public static Vector2 CartesianToSphericalVelocity(Vector3 cartesianVelocity, Vector2 sphericalCoords, float length, float epsilon) {
-        float theta = sphericalCoords.x; float phi = sphericalCoords.y;
-        float omega = (Mathf.Sin(theta) * (cartesianVelocity.x * Mathf.Cos(phi) + cartesianVelocity.z * Mathf.Sin(phi)) + cartesianVelocity.y * Mathf.Cos(theta)) / length;
-        float dividant = length * Mathf.Sin(theta);
+        float cost = Mathf.Cos(sphericalCoords.x); float sint = Mathf.Sin(sphericalCoords.x); float cosp = Mathf.Cos(sphericalCoords.y); float sinp = Mathf.Sin(sphericalCoords.y);
+        float omega = (sint * (cartesianVelocity.x * cosp + cartesianVelocity.z * sinp) + cartesianVelocity.y * cost) / length;
+        float dividant = length * sint;
         float alpha;
         if (dividant < epsilon) { alpha = 0; }
-        else { alpha = (cartesianVelocity.z * Mathf.Cos(phi) - cartesianVelocity.x * Mathf.Sin(phi)) / (length * Mathf.Sin(theta)); }
+        else { alpha = (cartesianVelocity.z * cosp - cartesianVelocity.x * sinp) / (length * sint); }
         return new Vector2(omega, alpha);
     }
 
@@ -43,21 +44,22 @@ public static class Utils {
         if (sphericalCoords.z == 0) {
             throw new System.ArgumentException("Length must be non-zero! This may be a cast from Vector2.");
         }
-        float theta = sphericalCoords.x; float phi = sphericalCoords.y; float length = sphericalCoords.z;
+        float length = sphericalCoords.z;
+        float cost = Mathf.Cos(sphericalCoords.x); float sint = Mathf.Sin(sphericalCoords.x); float cosp = Mathf.Cos(sphericalCoords.y); float sinp = Mathf.Sin(sphericalCoords.y);
         float omega = sphericalVelocity.x; float alpha = sphericalVelocity.y; float lengthDot = sphericalVelocity.z;
 
-        float xDot = length * (omega * Mathf.Cos(theta) * Mathf.Cos(phi) - alpha * Mathf.Sin(theta) * Mathf.Sin(phi)) + lengthDot * Mathf.Sin(theta) * Mathf.Cos(phi);
-        float yDot = length * omega * Mathf.Sin(theta) - lengthDot * Mathf.Cos(theta);
-        float zDot = length * (omega * Mathf.Cos(theta) * Mathf.Sin(phi) + alpha * Mathf.Sin(theta) * Mathf.Cos(phi)) + lengthDot * Mathf.Sin(theta) * Mathf.Sin(phi);
+        float xDot = length * (omega * cost * cosp - alpha * sint * sinp) + lengthDot * sint * cosp;
+        float yDot = length * omega * sint - lengthDot * cost;
+        float zDot = length * (omega * cost * sinp + alpha * sint * cosp) + lengthDot * sint * sinp;
         return new Vector3(xDot, yDot, zDot);
     }
 
     public static Vector3 SphericalToCartesianVelocity(Vector2 sphericalVelocity, Vector2 sphericalCoords, float length) {
-        float theta = sphericalCoords.x; float phi = sphericalCoords.y;
+        float cost = Mathf.Cos(sphericalCoords.x); float sint = Mathf.Sin(sphericalCoords.x); float cosp = Mathf.Cos(sphericalCoords.y); float sinp = Mathf.Sin(sphericalCoords.y);
         float omega = sphericalVelocity.x; float alpha = sphericalVelocity.y;
-        float xDot = length * (omega * Mathf.Cos(theta) * Mathf.Cos(phi) - alpha * Mathf.Sin(theta) * Mathf.Sin(phi));
-        float yDot = length * omega * Mathf.Sin(theta);
-        float zDot = length * (omega * Mathf.Cos(theta) * Mathf.Sin(phi) + alpha * Mathf.Sin(theta) * Mathf.Cos(phi));
+        float xDot = length * (omega * cost * cosp - alpha * sint * sinp);
+        float yDot = length * omega * sint;
+        float zDot = length * (omega * cost * sinp + alpha * sint * cosp);
         return new Vector3(xDot, yDot, zDot);
     }
 
@@ -65,11 +67,12 @@ public static class Utils {
         if (sphericalCoords.z == 0) {
             throw new System.ArgumentException("Length must be non-zero! This may be a cast from Vector2.");
         }
-        float theta = sphericalCoords.x; float phi = sphericalCoords.y; float length = sphericalCoords.z;
+        float length = sphericalCoords.z;
+        float cost = Mathf.Cos(sphericalCoords.x); float sint = Mathf.Sin(sphericalCoords.x); float cosp = Mathf.Cos(sphericalCoords.y); float sinp = Mathf.Sin(sphericalCoords.y);
 
-        float x = length * Mathf.Sin(theta) * Mathf.Cos(phi);
-        float y = -length * Mathf.Cos(theta);
-        float z = length * Mathf.Sin(theta) * Mathf.Sin(phi);
+        float x = length * sint * cosp;
+        float y = -length * cost;
+        float z = length * sint * sinp;
         return new Vector3(x, y, z);
     }
 
