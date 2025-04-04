@@ -16,11 +16,11 @@ public static class Utils {
         float length = sphericalCoords.z;
         float cost = Mathf.Cos(sphericalCoords.x); float sint = Mathf.Sin(sphericalCoords.x); float cosp = Mathf.Cos(sphericalCoords.y); float sinp = Mathf.Sin(sphericalCoords.y);
 
-        float lengthDot = cost * (cartesianVelocity.x * cosp + cartesianVelocity.z * sinp) - cartesianVelocity.y * sint;
+        float lengthDot = sint * (cartesianVelocity.x * cosp + cartesianVelocity.z * sinp) - cartesianVelocity.y * cost;
 
         float omega;
         if (length <= epsilon) { omega = 0; }
-        else { omega = (sint * (cartesianVelocity.x * cosp + cartesianVelocity.z * sinp) + cartesianVelocity.y * cost) / length; }
+        else { omega = (cost * (cartesianVelocity.x * cosp + cartesianVelocity.z * sinp) + cartesianVelocity.y * sint) / length; }
 
         float dividant = length * sint;
         float alpha;
@@ -32,7 +32,7 @@ public static class Utils {
 
     public static Vector2 CartesianToSphericalVelocity(Vector3 cartesianVelocity, Vector2 sphericalCoords, float length, float epsilon) {
         float cost = Mathf.Cos(sphericalCoords.x); float sint = Mathf.Sin(sphericalCoords.x); float cosp = Mathf.Cos(sphericalCoords.y); float sinp = Mathf.Sin(sphericalCoords.y);
-        float omega = (sint * (cartesianVelocity.x * cosp + cartesianVelocity.z * sinp) + cartesianVelocity.y * cost) / length;
+        float omega = (cost * (cartesianVelocity.x * cosp + cartesianVelocity.z * sinp) + cartesianVelocity.y * sint) / length;
         float dividant = length * sint;
         float alpha;
         if (dividant < epsilon) { alpha = 0; }
