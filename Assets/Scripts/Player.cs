@@ -59,7 +59,6 @@ public class Player : MonoBehaviour {
             SwitchAnchor();
             Grapple();
             SphericalVelocity = Utils.CartesianToSphericalVelocity(CartesianVelocity, SphericalCoords, length, GameManager.Instance.epsilon);
-            lineDrawer.setAnchor(Anchors[anchorIndex].transform);
         }
     }
 
@@ -85,6 +84,7 @@ public class Player : MonoBehaviour {
         Vector3 relativePos = transform.position - Anchors[anchorIndex].transform.position;
         length = Mathf.Max(relativePos.magnitude, GameManager.Instance.epsilonLength);
         SphericalCoords = Utils.RelativeCartesianToSphericalCoords(relativePos, length);
+        lineDrawer.setAnchor(Anchors[anchorIndex].transform);
     }
 
     private void SpawnParticle() {
