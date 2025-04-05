@@ -23,7 +23,7 @@ public class LineDrawer : MonoBehaviour {
             lineRenderer.SetPosition(0, player.position);
             lineRenderer.SetPosition(1, anchor.position);
 
-            lineColor = Color.HSVToRGB(1, stress, 1);
+            lineColor = Color.HSVToRGB(1, 1, stress);
             lineRenderer.startColor = lineColor;
             lineRenderer.endColor = lineColor;
         }
