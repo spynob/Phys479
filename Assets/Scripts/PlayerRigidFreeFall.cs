@@ -50,7 +50,7 @@ public class PlayerRigidFreeFall : MonoBehaviour {
     private void Update() {
         if (GetInput.Swing && !Switching) {
             Debug.Log("SWITCH");
-            CartesianVelocity = Utils.SphericalToCartesianVelocity(SphericalVelocity, SphericalCoords, length);
+            CartesianVelocity = Utils.SphericalToCartesianVelocity(SphericalVelocity, Utils.RelativeCartesianToSphericalCoords(transform.position - Anchors[anchorIndex].transform.position), length);
             lineDrawer.setAnchor(null);
             Switching = true;
             return;

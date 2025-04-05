@@ -61,17 +61,17 @@ public class PlayerRigidFlexible : MonoBehaviour {
             Switching = false;
             SwitchAnchor();
             Grapple();
-            SphericalVelocity = Utils.CartesianToSphericalVelocity(CartesianVelocity, SphericalCoords, length, GameManager.Instance.epsilon);
+            SphericalVelocity = Utils.CartesianToSphericalVelocity(CartesianVelocity, Utils.RelativeCartesianToSphericalCoords(transform.position - Anchors[anchorIndex].transform.position), length, GameManager.Instance.epsilon);
             FreeFalling = true;
         }
         if (!Utils.IsRadialMovementOutwardRigid(SphericalCoords, SphericalVelocity) && !FreeFalling && !Switching) {
-            CartesianVelocity = Utils.SphericalToCartesianVelocity(SphericalVelocity, SphericalCoords, length);
+            CartesianVelocity = Utils.SphericalToCartesianVelocity(SphericalVelocity, Utils.RelativeCartesianToSphericalCoords(transform.position - Anchors[anchorIndex].transform.position), length);
             FreeFalling = true;
         }
         else if (Vector3.Distance(transform.position, Anchors[anchorIndex].transform.position) >= length + GameManager.Instance.epsilonLength && FreeFalling && !Switching) {
             FreeFalling = false;
             SphericalCoords = Utils.RelativeCartesianToSphericalCoords(transform.position - Anchors[anchorIndex].transform.position);
-            SphericalVelocity = Utils.CartesianToSphericalVelocity(CartesianVelocity, SphericalCoords, length, GameManager.Instance.epsilon);
+            SphericalVelocity = Utils.CartesianToSphericalVelocity(CartesianVelocity, Utils.RelativeCartesianToSphericalCoords(transform.position - Anchors[anchorIndex].transform.position), length, GameManager.Instance.epsilon);
 
         }
     }

@@ -52,10 +52,11 @@ public class PlayerSpringDirect : MonoBehaviour {
         if (GetInput.Swing && !Switching) {
             Debug.Log("SWITCH");
             Debug.Log("Coords: " + SphericalCoords + ", Velocities: " + SphericalVelocity + ", Natural Length: " + naturalLength);
-            CartesianVelocity = Utils.SphericalToCartesianVelocity(SphericalVelocity, SphericalCoords);
+            CartesianVelocity = Utils.SphericalToCartesianVelocity(SphericalVelocity, Utils.RelativeCartesianToSphericalCoords(transform.position - Anchors[anchorIndex].transform.position));
+            Debug.Log("CartesianVel: " + CartesianVelocity);
             SwitchAnchor();
             Grapple();
-            SphericalVelocity = Utils.CartesianToSphericalVelocity(CartesianVelocity, SphericalVelocity, GameManager.Instance.epsilon);
+            SphericalVelocity = Utils.CartesianToSphericalVelocity(CartesianVelocity, SphericalCoords, GameManager.Instance.epsilon);
             Debug.Log("Coords: " + SphericalCoords + ", Velocities: " + SphericalVelocity + ", Natural Length: " + naturalLength);
             Switching = true;
             return;

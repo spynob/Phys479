@@ -54,7 +54,7 @@ public class PlayerRigidDirect : MonoBehaviour {
     private void Update() {
         if (GetInput.Swing && !Switching) {
             Debug.Log("SWITCH");
-            CartesianVelocity = Utils.SphericalToCartesianVelocity(SphericalVelocity, SphericalCoords, length);
+            CartesianVelocity = Utils.SphericalToCartesianVelocity(SphericalVelocity, Utils.RelativeCartesianToSphericalCoords(transform.position - Anchors[anchorIndex].transform.position), length);
             SwitchAnchor();
             Grapple();
             SphericalVelocity = Utils.CartesianToSphericalVelocity(CartesianVelocity, SphericalCoords, length, GameManager.Instance.epsilonLength);
