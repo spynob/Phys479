@@ -81,7 +81,7 @@ public class PlayerRigidDirect : MonoBehaviour {
     private void Grapple() {
         Vector3 relativePos = transform.position - Anchors[anchorIndex].transform.position;
         length = relativePos.magnitude;
-        SphericalCoords = Utils.RelativeCartesianToSphericalCoords(relativePos, length);
+        SphericalCoords = Utils.RelativeCartesianToSphericalCoords(relativePos);
         lineDrawer.setAnchor(Anchors[anchorIndex].transform);
     }
 
