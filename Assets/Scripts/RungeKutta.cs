@@ -34,9 +34,9 @@ public static class RungeKutta {
     static float sint;
     static float cost;
     private static float[] Derivatives(float[] state, float length) {
-        float theta = state[0];
-        float omega = state[1];
-        float alpha = state[3];
+        theta = state[0];
+        omega = state[1];
+        alpha = state[3];
 
         /*
         Here damping is supposed to be divided by mass. However, I only have one player of constant mass using these equations. Therefore I divided damping by the mass before hand (See Player.cs)
