@@ -14,6 +14,18 @@ public static class RungeKutta {
         return state;
     }
 
+    public static float[] StepSpring(float timeStep, float[] state, float naturalLength) { // state = [theta, thetaDot, phi, PhiDot, Length, LengthDot]
+        float[] k1 = Derivatives(state, naturalLength);
+        float[] k2 = Derivatives(AddVectors(state, MultiplyVector(k1, timeStep / 2)), naturalLength);
+        float[] k3 = Derivatives(AddVectors(state, MultiplyVector(k2, timeStep / 2)), naturalLength);
+        float[] k4 = Derivatives(AddVectors(state, MultiplyVector(k3, timeStep)), naturalLength);
+
+        for (int i = 0; i < state.Length; i++) {
+            state[i] += timeStep / 6 * (k1[i] + 2 * k2[i] + 2 * k3[i] + k4[i]);
+        }
+        return state;
+    }
+
     private static float[] Derivatives(float[] state, float length) {
         float theta = state[0];
         float omega = state[1];
