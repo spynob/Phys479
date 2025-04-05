@@ -5,7 +5,7 @@ public class LineDrawer : MonoBehaviour {
     public Transform anchor; // Second object
     private LineRenderer lineRenderer;
     public float width;
-    Color lineColor = new Color(255, 255, 255);
+    Color lineColor = new Color(0, 0, 0);
     private float stress = 0f;
     public float maxStretch = 0;
 
@@ -23,7 +23,7 @@ public class LineDrawer : MonoBehaviour {
             lineRenderer.SetPosition(0, player.position);
             lineRenderer.SetPosition(1, anchor.position);
 
-            lineColor = Color.HSVToRGB(0, stress, 1);
+            lineColor = Color.HSVToRGB(1, stress, 1);
             lineRenderer.startColor = lineColor;
             lineRenderer.endColor = lineColor;
         }

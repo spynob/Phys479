@@ -1,5 +1,6 @@
 using System;
 using Unity.VisualScripting;
+using Unity.VisualScripting.YamlDotNet.Core.Tokens;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
@@ -22,7 +23,7 @@ public class PlayerRigidDirect : MonoBehaviour {
     public Vector2 IntialSphericalVelocity = new Vector2(0, 0); // (omega, alpha)
 
     // Anchor stuff
-    public GameObject[] Anchors;
+    private GameObject[] Anchors;
     private int anchorIndex = 0;
 
     // Pendulum stuff
@@ -39,6 +40,7 @@ public class PlayerRigidDirect : MonoBehaviour {
         // Very bad, but saves multiple divisions per frame. In the acceleration formulas (see RungeKutta.cs for more info), damping is supposed to be divided by mass, since mass is constant here and there is only one player, I optimized it by doing the division beforehand
         // DO NOT DO THIS IF YOU HAVE MULTIPLE OBJECTS OF VARYING MASS USING THE RUNGEKUTTA APPROX AND REMOVE THE NEXT LINE
         GameManager.Instance.UpdateDamping(mass);
+        Anchors = GameManager.Instance.Anchors;
         lineDrawer = GameObject.Find("LineDrawer").GetComponent<LineDrawer>();
         InvokeRepeating(nameof(SpawnParticle), 0f, ParticleInterval);
 
