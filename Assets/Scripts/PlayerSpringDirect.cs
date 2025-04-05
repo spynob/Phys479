@@ -19,7 +19,8 @@ public class PlayerSpringDirect : MonoBehaviour {
 
     // Properties
     public float mass = 100;
-    public Vector3 IntialSphericalCoordinates = new Vector3(0, 0, 0); // (omega, alpha, stretching)
+    public Vector3 InitialSphericalVelocity = new Vector3(0, 0, 0); // (omega, alpha, lengthDot)
+    public float InitialStretch = 0;
 
     // Anchor stuff
     private GameObject[] Anchors;
@@ -40,24 +41,21 @@ public class PlayerSpringDirect : MonoBehaviour {
         // DO NOT DO THIS IF YOU HAVE MULTIPLE OBJECTS OF VARYING MASS USING THE RUNGEKUTTA APPROX AND REMOVE THE NEXT LINE
         GameManager.Instance.UpdateDampingAndK(mass);
         Anchors = GameManager.Instance.Anchors;
-        lineDrawer = GameObject.Find("LineDrawer").GetComponent<LineDrawer>();
         InvokeRepeating(nameof(SpawnParticle), 0f, ParticleInterval);
+        lineDrawer = GameObject.Find("LineDrawer").GetComponent<LineDrawer>();
 
-        SphericalVelocity = new Vector3(IntialSphericalCoordinates.x, IntialSphericalCoordinates.y, 0);
+        SphericalVelocity = new Vector3(InitialSphericalVelocity.x, InitialSphericalVelocity.y, InitialSphericalVelocity.z);
         Grapple();
-        naturalLength = Mathf.Max(naturalLength - IntialSphericalCoordinates.z, GameManager.Instance.epsilonLength * 1.1f);
+        naturalLength = Mathf.Max(naturalLength - InitialStretch, GameManager.Instance.epsilonLength * 1.1f);
     }
 
     private void Update() {
         if (GetInput.Swing && !Switching) {
             Debug.Log("SWITCH");
-            Debug.Log("Coords: " + SphericalCoords + ", Velocities: " + SphericalVelocity + ", Natural Length: " + naturalLength);
             CartesianVelocity = Utils.SphericalToCartesianVelocity(SphericalVelocity, Utils.RelativeCartesianToSphericalCoords(transform.position - Anchors[anchorIndex].transform.position));
-            Debug.Log("CartesianVel: " + CartesianVelocity);
             SwitchAnchor();
             Grapple();
             SphericalVelocity = Utils.CartesianToSphericalVelocity(CartesianVelocity, SphericalCoords, GameManager.Instance.epsilon);
-            Debug.Log("Coords: " + SphericalCoords + ", Velocities: " + SphericalVelocity + ", Natural Length: " + naturalLength);
             Switching = true;
             return;
         }
@@ -72,7 +70,6 @@ public class PlayerSpringDirect : MonoBehaviour {
             float[] state = { SphericalCoords.x, SphericalVelocity.x, SphericalCoords.y, SphericalVelocity.y, SphericalCoords.z, SphericalVelocity.z };
             state = RungeKutta.StepSpring(Time.fixedDeltaTime, state, naturalLength);
             ParseState(state);
-            //Debug.Log("Spherical Velocity: " + SphericalVelocity + ", Spherical Coords: " + SphericalCoords + ", Natural Length: " + naturalLength);
             transform.position = Anchors[anchorIndex].transform.position + Utils.SphericalToCartesianCoords(SphericalCoords);
         }
     }
