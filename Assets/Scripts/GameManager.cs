@@ -13,6 +13,7 @@ public class GameManager : MonoBehaviour {
     public float DecayTime;
     public float epsilon = 0.05f;
     public float epsilonLength = 1f;
+    public GameObject[] Anchors;
 
     private void Awake() {
         if (Instance == null) {

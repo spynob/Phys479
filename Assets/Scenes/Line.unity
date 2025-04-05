@@ -477,6 +477,13 @@ MonoBehaviour:
   DecayTime: 0
   epsilon: 0.05
   epsilonLength: 0.1
+  Anchors:
+  - {fileID: 972973545}
+  - {fileID: 662100310}
+  - {fileID: 943455952}
+  - {fileID: 804297300}
+  - {fileID: 635412121}
+  - {fileID: 1582039007}
 --- !u!4 &599610586
 Transform:
   m_ObjectHideFlags: 0
@@ -911,13 +918,6 @@ MonoBehaviour:
   GetInput: {fileID: 599610584}
   mass: 10
   IntialSphericalVelocity: {x: 0, y: 0}
-  Anchors:
-  - {fileID: 972973545}
-  - {fileID: 662100310}
-  - {fileID: 943455952}
-  - {fileID: 804297300}
-  - {fileID: 635412121}
-  - {fileID: 1582039007}
 --- !u!114 &873126565
 MonoBehaviour:
   m_ObjectHideFlags: 0
