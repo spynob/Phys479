@@ -54,7 +54,7 @@ public class PlayerSpringFlexible : MonoBehaviour {
         if (GetInput.Swing && !Switching) {
             Debug.Log("SWITCH");
             SphericalCoords = Utils.RelativeCartesianToSphericalCoords(transform.position - Anchors[anchorIndex].transform.position);
-            CartesianVelocity = Utils.SphericalToCartesianVelocity(SphericalVelocity, SphericalCoords);
+            if(!FreeFalling){CartesianVelocity = Utils.SphericalToCartesianVelocity(SphericalVelocity, SphericalCoords);}
             lineDrawer.SetAnchor(null);
             Switching = true;
             FreeFalling = true;
