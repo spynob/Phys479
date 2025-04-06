@@ -62,7 +62,7 @@ public class PlayerSpringDirect : MonoBehaviour {
         else if (!GetInput.Swing && Switching) {
             Switching = false;
         }
-        lineDrawer.setStress(SphericalCoords.z - naturalLength);
+        lineDrawer.SetStress(SphericalCoords.z - naturalLength);
     }
 
     void FixedUpdate() {
@@ -82,7 +82,7 @@ public class PlayerSpringDirect : MonoBehaviour {
         Vector3 relativePos = transform.position - Anchors[anchorIndex].transform.position;
         naturalLength = Mathf.Max(relativePos.magnitude, GameManager.Instance.epsilonLength);
         SphericalCoords = Utils.RelativeCartesianToSphericalCoords(relativePos);
-        lineDrawer.setAnchor(Anchors[anchorIndex].transform);
+        lineDrawer.SetAnchor(Anchors[anchorIndex].transform);
     }
 
     private void SpawnParticle() {

@@ -19,7 +19,7 @@ public class PlayerRigidFlexible : MonoBehaviour {
 
     // Properties
     public float mass = 100;
-    public Vector2 IntialSphericalVelocity = new Vector2(0, 0); // (omega, alpha)
+    public Vector2 InitialSphericalVelocity = new Vector2(0, 0); // (omega, alpha)
 
     // Anchor stuff
     private GameObject[] Anchors;
@@ -44,15 +44,16 @@ public class PlayerRigidFlexible : MonoBehaviour {
         InvokeRepeating(nameof(SpawnParticle), 0f, ParticleInterval);
         lineDrawer = GameObject.Find("LineDrawer").GetComponent<LineDrawer>();
 
-        SphericalVelocity = new Vector2(IntialSphericalVelocity.x, IntialSphericalVelocity.y);
+        SphericalVelocity = new Vector2(InitialSphericalVelocity.x, InitialSphericalVelocity.y);
         Grapple();
     }
 
     private void Update() {
+        SphericalCoords = Utils.RelativeCartesianToSphericalCoords(transform.position - Anchors[anchorIndex].transform.position);
         if (GetInput.Swing && !Switching) {
             Debug.Log("SWITCH");
             CartesianVelocity = Utils.SphericalToCartesianVelocity(SphericalVelocity, SphericalCoords, length);
-            lineDrawer.setAnchor(null);
+            lineDrawer.SetAnchor(null);
             Switching = true;
             FreeFalling = true;
             return;
@@ -61,18 +62,18 @@ public class PlayerRigidFlexible : MonoBehaviour {
             Switching = false;
             SwitchAnchor();
             Grapple();
-            SphericalVelocity = Utils.CartesianToSphericalVelocity(CartesianVelocity, Utils.RelativeCartesianToSphericalCoords(transform.position - Anchors[anchorIndex].transform.position), length, GameManager.Instance.epsilon);
-            FreeFalling = true;
+            SphericalVelocity = Utils.CartesianToSphericalVelocity(CartesianVelocity, SphericalCoords, length, GameManager.Instance.epsilon);
+            FreeFalling = false;
         }
         if (!Utils.IsRadialMovementOutwardRigid(SphericalCoords, SphericalVelocity) && !FreeFalling && !Switching) {
-            CartesianVelocity = Utils.SphericalToCartesianVelocity(SphericalVelocity, Utils.RelativeCartesianToSphericalCoords(transform.position - Anchors[anchorIndex].transform.position), length);
             FreeFalling = true;
+            CartesianVelocity = Utils.SphericalToCartesianVelocity(SphericalVelocity, SphericalCoords, length);
+            lineDrawer.SetToFreefall();
         }
         else if (Vector3.Distance(transform.position, Anchors[anchorIndex].transform.position) >= length + GameManager.Instance.epsilonLength && FreeFalling && !Switching) {
             FreeFalling = false;
-            SphericalCoords = Utils.RelativeCartesianToSphericalCoords(transform.position - Anchors[anchorIndex].transform.position);
-            SphericalVelocity = Utils.CartesianToSphericalVelocity(CartesianVelocity, Utils.RelativeCartesianToSphericalCoords(transform.position - Anchors[anchorIndex].transform.position), length, GameManager.Instance.epsilon);
-
+            SphericalVelocity = Utils.CartesianToSphericalVelocity(CartesianVelocity, SphericalCoords, length, GameManager.Instance.epsilon);
+            lineDrawer.SetToPendulum();
         }
     }
 
@@ -81,7 +82,6 @@ public class PlayerRigidFlexible : MonoBehaviour {
             float[] state = { SphericalCoords.x, SphericalVelocity.x, SphericalCoords.y, SphericalVelocity.y };
             state = RungeKutta.Step(Time.fixedDeltaTime, state, length);
             ParseState(state);
-            //Debug.Log("Theta: " + theta + ", Omega: " + omega + ", Phi: " + phi + ", Alpha: " + alpha + ", Length: " + length + ", LengthDot: " + lengthDot + ", Natural Length: " + naturalLength);
             transform.position = Anchors[anchorIndex].transform.position + Utils.SphericalToCartesianCoords(SphericalCoords, length);
         }
         else {
@@ -98,7 +98,8 @@ public class PlayerRigidFlexible : MonoBehaviour {
         Vector3 relativePos = transform.position - Anchors[anchorIndex].transform.position;
         length = Mathf.Max(relativePos.magnitude, GameManager.Instance.epsilonLength);
         SphericalCoords = Utils.RelativeCartesianToSphericalCoords(relativePos);
-        lineDrawer.setAnchor(Anchors[anchorIndex].transform);
+        lineDrawer.SetAnchor(Anchors[anchorIndex].transform);
+        lineDrawer.SetToPendulum();
     }
 
     private void SpawnParticle() {

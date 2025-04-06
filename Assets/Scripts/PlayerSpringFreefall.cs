@@ -1,6 +1,5 @@
 using System;
 using Unity.VisualScripting;
-using Unity.VisualScripting.YamlDotNet.Core.Tokens;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
@@ -54,7 +53,7 @@ public class PlayerSpringFreefall : MonoBehaviour {
         if (GetInput.Swing && !Switching) {
             Debug.Log("SWITCH");
             CartesianVelocity = Utils.SphericalToCartesianVelocity(SphericalVelocity, Utils.RelativeCartesianToSphericalCoords(transform.position - Anchors[anchorIndex].transform.position));
-            lineDrawer.setAnchor(null);
+            lineDrawer.SetAnchor(null);
             Switching = true;
             return;
         }
@@ -64,7 +63,7 @@ public class PlayerSpringFreefall : MonoBehaviour {
             Grapple();
             SphericalVelocity = Utils.CartesianToSphericalVelocity(CartesianVelocity, SphericalCoords, GameManager.Instance.epsilon);
         }
-        lineDrawer.setStress(SphericalCoords.z - naturalLength);
+        lineDrawer.SetStress(SphericalCoords.z - naturalLength);
     }
 
     void FixedUpdate() {
@@ -88,7 +87,7 @@ public class PlayerSpringFreefall : MonoBehaviour {
         Vector3 relativePos = transform.position - Anchors[anchorIndex].transform.position;
         naturalLength = Mathf.Max(relativePos.magnitude, GameManager.Instance.epsilonLength);
         SphericalCoords = Utils.RelativeCartesianToSphericalCoords(relativePos);
-        lineDrawer.setAnchor(Anchors[anchorIndex].transform);
+        lineDrawer.SetAnchor(Anchors[anchorIndex].transform);
     }
 
     private void SpawnParticle() {

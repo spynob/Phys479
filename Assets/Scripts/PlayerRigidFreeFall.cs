@@ -51,7 +51,7 @@ public class PlayerRigidFreeFall : MonoBehaviour {
         if (GetInput.Swing && !Switching) {
             Debug.Log("SWITCH");
             CartesianVelocity = Utils.SphericalToCartesianVelocity(SphericalVelocity, Utils.RelativeCartesianToSphericalCoords(transform.position - Anchors[anchorIndex].transform.position), length);
-            lineDrawer.setAnchor(null);
+            lineDrawer.SetAnchor(null);
             Switching = true;
             return;
         }
@@ -85,7 +85,7 @@ public class PlayerRigidFreeFall : MonoBehaviour {
         Vector3 relativePos = transform.position - Anchors[anchorIndex].transform.position;
         length = Mathf.Max(relativePos.magnitude, GameManager.Instance.epsilonLength);
         SphericalCoords = Utils.RelativeCartesianToSphericalCoords(relativePos);
-        lineDrawer.setAnchor(Anchors[anchorIndex].transform);
+        lineDrawer.SetAnchor(Anchors[anchorIndex].transform);
     }
 
     private void SpawnParticle() {

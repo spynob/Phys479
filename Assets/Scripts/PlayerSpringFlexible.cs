@@ -51,10 +51,11 @@ public class PlayerSpringFlexible : MonoBehaviour {
     }
 
     private void Update() {
+        SphericalCoords = Utils.RelativeCartesianToSphericalCoords(transform.position - Anchors[anchorIndex].transform.position);
         if (GetInput.Swing && !Switching) {
             Debug.Log("SWITCH");
-            CartesianVelocity = Utils.SphericalToCartesianVelocity(SphericalVelocity, Utils.RelativeCartesianToSphericalCoords(transform.position - Anchors[anchorIndex].transform.position));
-            lineDrawer.setAnchor(null);
+            CartesianVelocity = Utils.SphericalToCartesianVelocity(SphericalVelocity, SphericalCoords);
+            lineDrawer.SetAnchor(null);
             Switching = true;
             FreeFalling = true;
             return;
@@ -64,23 +65,23 @@ public class PlayerSpringFlexible : MonoBehaviour {
             SwitchAnchor();
             Grapple();
             SphericalVelocity = Utils.CartesianToSphericalVelocity(CartesianVelocity, SphericalCoords, GameManager.Instance.epsilon);
-            FreeFalling = true;
-            return;
+            FreeFalling = false;
         }
         if (SphericalCoords.z + GameManager.Instance.epsilonLength < naturalLength && !FreeFalling && !Switching) {
             FreeFalling = true;
-            CartesianVelocity = Utils.SphericalToCartesianVelocity(SphericalVelocity, Utils.RelativeCartesianToSphericalCoords(transform.position - Anchors[anchorIndex].transform.position));
+            CartesianVelocity = Utils.SphericalToCartesianVelocity(SphericalVelocity, SphericalCoords);
+            lineDrawer.SetToFreefall();
         }
-        else if (Vector3.Distance(transform.position, Anchors[anchorIndex].transform.position) >= naturalLength && FreeFalling && !Switching) {
+        else if (SphericalCoords.z >= naturalLength && FreeFalling && !Switching) {
             FreeFalling = false;
-            SphericalCoords = Utils.RelativeCartesianToSphericalCoords(transform.position - Anchors[anchorIndex].transform.position);
             SphericalVelocity = Utils.CartesianToSphericalVelocity(CartesianVelocity, SphericalCoords, GameManager.Instance.epsilon);
+            lineDrawer.SetToPendulum();
         }
-        lineDrawer.setStress(SphericalCoords.z - naturalLength);
+        lineDrawer.SetStress(SphericalCoords.z - naturalLength);
     }
 
     void FixedUpdate() {
-        if (!FreeFalling && !Switching) {
+        if (!FreeFalling) {
             float[] state = { SphericalCoords.x, SphericalVelocity.x, SphericalCoords.y, SphericalVelocity.y, SphericalCoords.z, SphericalVelocity.z };
             state = RungeKutta.StepSpring(Time.fixedDeltaTime, state, naturalLength);
             ParseState(state);
@@ -100,7 +101,8 @@ public class PlayerSpringFlexible : MonoBehaviour {
         Vector3 relativePos = transform.position - Anchors[anchorIndex].transform.position;
         naturalLength = Mathf.Max(relativePos.magnitude, GameManager.Instance.epsilonLength);
         SphericalCoords = Utils.RelativeCartesianToSphericalCoords(relativePos);
-        lineDrawer.setAnchor(Anchors[anchorIndex].transform);
+        lineDrawer.SetAnchor(Anchors[anchorIndex].transform);
+        lineDrawer.SetToPendulum();
     }
 
     private void SpawnParticle() {
