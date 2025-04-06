@@ -67,11 +67,11 @@ public class PlayerSpringFlexible : MonoBehaviour {
             FreeFalling = true;
             return;
         }
-        if (SphericalCoords.z + GameManager.Instance.epsilonLength < naturalLength && !FreeFalling) {
+        if (SphericalCoords.z + GameManager.Instance.epsilonLength < naturalLength && !FreeFalling && !Switching) {
             FreeFalling = true;
             CartesianVelocity = Utils.SphericalToCartesianVelocity(SphericalVelocity, Utils.RelativeCartesianToSphericalCoords(transform.position - Anchors[anchorIndex].transform.position));
         }
-        else if (SphericalCoords.z >= naturalLength && FreeFalling) {
+        else if (Vector3.Distance(transform.position, Anchors[anchorIndex].transform.position) >= naturalLength && FreeFalling && !Switching) {
             FreeFalling = false;
             SphericalCoords = Utils.RelativeCartesianToSphericalCoords(transform.position - Anchors[anchorIndex].transform.position);
             SphericalVelocity = Utils.CartesianToSphericalVelocity(CartesianVelocity, SphericalCoords, GameManager.Instance.epsilon);
@@ -80,7 +80,7 @@ public class PlayerSpringFlexible : MonoBehaviour {
     }
 
     void FixedUpdate() {
-        if (!FreeFalling) {
+        if (!FreeFalling && !Switching) {
             float[] state = { SphericalCoords.x, SphericalVelocity.x, SphericalCoords.y, SphericalVelocity.y, SphericalCoords.z, SphericalVelocity.z };
             state = RungeKutta.StepSpring(Time.fixedDeltaTime, state, naturalLength);
             ParseState(state);
