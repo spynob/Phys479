@@ -51,9 +51,9 @@ public class PlayerSpringFlexible : MonoBehaviour {
     }
 
     private void Update() {
-        SphericalCoords = Utils.RelativeCartesianToSphericalCoords(transform.position - Anchors[anchorIndex].transform.position);
         if (GetInput.Swing && !Switching) {
             Debug.Log("SWITCH");
+            SphericalCoords = Utils.RelativeCartesianToSphericalCoords(transform.position - Anchors[anchorIndex].transform.position);
             CartesianVelocity = Utils.SphericalToCartesianVelocity(SphericalVelocity, SphericalCoords);
             lineDrawer.SetAnchor(null);
             Switching = true;
@@ -65,15 +65,18 @@ public class PlayerSpringFlexible : MonoBehaviour {
             SwitchAnchor();
             Grapple();
             SphericalVelocity = Utils.CartesianToSphericalVelocity(CartesianVelocity, SphericalCoords, GameManager.Instance.epsilon);
-            FreeFalling = false;
-        }
-        if (SphericalCoords.z + GameManager.Instance.epsilonLength < naturalLength && !FreeFalling && !Switching) {
             FreeFalling = true;
+            return;
+        }
+        if (Vector3.Distance(transform.position, Anchors[anchorIndex].transform.position) + GameManager.Instance.epsilonLength < naturalLength && !FreeFalling && !Switching) {
+            FreeFalling = true;
+            SphericalCoords = Utils.RelativeCartesianToSphericalCoords(transform.position - Anchors[anchorIndex].transform.position);
             CartesianVelocity = Utils.SphericalToCartesianVelocity(SphericalVelocity, SphericalCoords);
             lineDrawer.SetToFreefall();
         }
-        else if (SphericalCoords.z >= naturalLength && FreeFalling && !Switching) {
+        else if (Vector3.Distance(transform.position, Anchors[anchorIndex].transform.position) >= naturalLength && FreeFalling && !Switching) {
             FreeFalling = false;
+            SphericalCoords = Utils.RelativeCartesianToSphericalCoords(transform.position - Anchors[anchorIndex].transform.position);
             SphericalVelocity = Utils.CartesianToSphericalVelocity(CartesianVelocity, SphericalCoords, GameManager.Instance.epsilon);
             lineDrawer.SetToPendulum();
         }
