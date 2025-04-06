@@ -40,10 +40,10 @@ public class LineDrawer : MonoBehaviour {
     }
 
     public void SetToFreefall() {
-        Pendulum = true;
+        Pendulum = false;
     }
 
     public void SetToPendulum() {
-        Pendulum = false;
+        Pendulum = true;
     }
 }
