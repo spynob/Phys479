@@ -28,8 +28,8 @@ public class PlayerSpringFlexible : MonoBehaviour {
 
     // Pendulum stuff
     private float naturalLength;
-    private Vector3 SphericalCoords; // (theta [polar], phi [azimuthal], length [radial])
-    private Vector3 SphericalVelocity; // (omega [thetaDot], alpha [phiDot], lengthDot)
+    public Vector3 SphericalCoords; // (theta [polar], phi [azimuthal], length [radial])
+    public Vector3 SphericalVelocity; // (omega [thetaDot], alpha [phiDot], lengthDot)
     private Vector3 SphericalAcc; // (omegaDot [thetaDotDot], alphaDot [phiDOtDot], lengthDotDot)
     private Vector3 CartesianVelocity; // (xDot, yDot, zDot)
     bool Switching = false;
@@ -53,8 +53,9 @@ public class PlayerSpringFlexible : MonoBehaviour {
     private void Update() {
         if (GetInput.Swing && !Switching) {
             Debug.Log("SWITCH");
-            SphericalCoords = Utils.RelativeCartesianToSphericalCoords(transform.position - Anchors[anchorIndex].transform.position);
-            if(!FreeFalling){CartesianVelocity = Utils.SphericalToCartesianVelocity(SphericalVelocity, SphericalCoords);}
+            //SphericalCoords = Utils.RelativeCartesianToSphericalCoords(transform.position - Anchors[anchorIndex].transform.position);
+            Debug.Log(SphericalCoords);
+            if (!FreeFalling) { CartesianVelocity = Utils.SphericalToCartesianVelocity(SphericalVelocity, SphericalCoords); }
             lineDrawer.SetAnchor(null);
             Switching = true;
             FreeFalling = true;
@@ -68,17 +69,17 @@ public class PlayerSpringFlexible : MonoBehaviour {
             FreeFalling = true;
             return;
         }
-        if (Vector3.Distance(transform.position, Anchors[anchorIndex].transform.position) + GameManager.Instance.epsilonLength < naturalLength && !FreeFalling && !Switching) {
-            FreeFalling = true;
-            SphericalCoords = Utils.RelativeCartesianToSphericalCoords(transform.position - Anchors[anchorIndex].transform.position);
+        if (Vector3.Distance(transform.position, Anchors[anchorIndex].transform.position) < naturalLength && !FreeFalling && !Switching) {
+            //SphericalCoords = Utils.RelativeCartesianToSphericalCoords(transform.position - Anchors[anchorIndex].transform.position);
             CartesianVelocity = Utils.SphericalToCartesianVelocity(SphericalVelocity, SphericalCoords);
             lineDrawer.SetToFreefall();
+            FreeFalling = true;
         }
         else if (Vector3.Distance(transform.position, Anchors[anchorIndex].transform.position) >= naturalLength && FreeFalling && !Switching) {
-            FreeFalling = false;
             SphericalCoords = Utils.RelativeCartesianToSphericalCoords(transform.position - Anchors[anchorIndex].transform.position);
             SphericalVelocity = Utils.CartesianToSphericalVelocity(CartesianVelocity, SphericalCoords, GameManager.Instance.epsilon);
             lineDrawer.SetToPendulum();
+            FreeFalling = false;
         }
         lineDrawer.SetStress(SphericalCoords.z - naturalLength);
     }

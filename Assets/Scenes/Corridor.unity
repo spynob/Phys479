@@ -471,7 +471,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7746923b367730a429de8c7f3cd7972c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  gravity: 9.81
+  damping: 0.1
+  k: 0
   DecayTime: 10
+  epsilon: 0.05
+  epsilonLength: 1
+  Anchors: []
 --- !u!4 &599610586
 Transform:
   m_ObjectHideFlags: 0
@@ -905,18 +911,7 @@ MonoBehaviour:
   ParticleInterval: 0.5
   GetInput: {fileID: 599610584}
   mass: 100
-  gravity: 9.81
-  damping: 10
-  k: 7000
-  InitialStretching: 0
-  IntialVelocity: {x: 0, y: 0}
-  Anchors:
-  - {fileID: 972973545}
-  - {fileID: 662100310}
-  - {fileID: 943455952}
-  - {fileID: 804297300}
-  - {fileID: 635412121}
-  - {fileID: 1582039007}
+  IntialSphericalVelocity: {x: 0, y: 0}
 --- !u!114 &873126565
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1190,7 +1185,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8893957247397358613, guid: cb012a800886e6046a4a89a17b4a3d58, type: 3}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

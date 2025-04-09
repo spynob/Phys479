@@ -52,7 +52,7 @@ public class PlayerSpringFreefall : MonoBehaviour {
     private void Update() {
         if (GetInput.Swing && !Switching) {
             Debug.Log("SWITCH");
-            CartesianVelocity = Utils.SphericalToCartesianVelocity(SphericalVelocity, Utils.RelativeCartesianToSphericalCoords(transform.position - Anchors[anchorIndex].transform.position));
+            CartesianVelocity = Utils.SphericalToCartesianVelocity(SphericalVelocity, SphericalCoords);
             lineDrawer.SetAnchor(null);
             Switching = true;
             return;

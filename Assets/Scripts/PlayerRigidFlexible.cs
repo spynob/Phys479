@@ -49,10 +49,10 @@ public class PlayerRigidFlexible : MonoBehaviour {
     }
 
     private void Update() {
-        SphericalCoords = Utils.RelativeCartesianToSphericalCoords(transform.position - Anchors[anchorIndex].transform.position);
         if (GetInput.Swing && !Switching) {
             Debug.Log("SWITCH");
-            CartesianVelocity = Utils.SphericalToCartesianVelocity(SphericalVelocity, SphericalCoords, length);
+            //SphericalCoords = Utils.RelativeCartesianToSphericalCoords(transform.position - Anchors[anchorIndex].transform.position);
+            if (!FreeFalling) { CartesianVelocity = Utils.SphericalToCartesianVelocity(SphericalVelocity, SphericalCoords, length); }
             lineDrawer.SetAnchor(null);
             Switching = true;
             FreeFalling = true;
@@ -63,17 +63,18 @@ public class PlayerRigidFlexible : MonoBehaviour {
             SwitchAnchor();
             Grapple();
             SphericalVelocity = Utils.CartesianToSphericalVelocity(CartesianVelocity, SphericalCoords, length, GameManager.Instance.epsilon);
-            FreeFalling = false;
         }
         if (!Utils.IsRadialMovementOutwardRigid(SphericalCoords, SphericalVelocity) && !FreeFalling && !Switching) {
-            FreeFalling = true;
+            //SphericalCoords = Utils.RelativeCartesianToSphericalCoords(transform.position - Anchors[anchorIndex].transform.position);
             CartesianVelocity = Utils.SphericalToCartesianVelocity(SphericalVelocity, SphericalCoords, length);
             lineDrawer.SetToFreefall();
+            FreeFalling = true;
         }
         else if (Vector3.Distance(transform.position, Anchors[anchorIndex].transform.position) >= length + GameManager.Instance.epsilonLength && FreeFalling && !Switching) {
-            FreeFalling = false;
+            SphericalCoords = Utils.RelativeCartesianToSphericalCoords(transform.position - Anchors[anchorIndex].transform.position);
             SphericalVelocity = Utils.CartesianToSphericalVelocity(CartesianVelocity, SphericalCoords, length, GameManager.Instance.epsilon);
             lineDrawer.SetToPendulum();
+            FreeFalling = false;
         }
     }
 
