@@ -10,6 +10,7 @@ public class PlayerRigidDirect : MonoBehaviour {
     // Particles
     public bool MovementParticles = false;
     public GameObject particle;
+    public GameObject TransitionParticle;
     public float ParticleInterval = 0.5f;
 
     // Tether
@@ -57,6 +58,7 @@ public class PlayerRigidDirect : MonoBehaviour {
             CartesianVelocity = Utils.SphericalToCartesianVelocity(SphericalVelocity, SphericalCoords, length);
             SwitchAnchor();
             Grapple();
+            SpawnTransitionParticle();
             SphericalVelocity = Utils.CartesianToSphericalVelocity(CartesianVelocity, SphericalCoords, length, GameManager.Instance.epsilonLength);
             Switching = true;
             return;
@@ -90,6 +92,12 @@ public class PlayerRigidDirect : MonoBehaviour {
     private void SpawnParticle() {
         if (MovementParticles) {
             Instantiate(particle, transform.position, Quaternion.identity);
+        }
+    }
+
+    private void SpawnTransitionParticle() {
+        if (MovementParticles) {
+            Instantiate(TransitionParticle, transform.position, Quaternion.identity);
         }
     }
 

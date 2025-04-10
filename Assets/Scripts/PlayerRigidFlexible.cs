@@ -9,6 +9,7 @@ public class PlayerRigidFlexible : MonoBehaviour {
     // Particles
     public bool MovementParticles = false;
     public GameObject particle;
+    public GameObject TransitionParticle;
     public float ParticleInterval = 0.5f;
 
     // Tether
@@ -62,6 +63,7 @@ public class PlayerRigidFlexible : MonoBehaviour {
             Switching = false;
             SwitchAnchor();
             Grapple();
+            SpawnTransitionParticle();
             SphericalVelocity = Utils.CartesianToSphericalVelocity(CartesianVelocity, SphericalCoords, length, GameManager.Instance.epsilon);
         }
         if (!Utils.IsRadialMovementOutwardRigid(SphericalCoords, SphericalVelocity) && !FreeFalling && !Switching) {
@@ -106,6 +108,12 @@ public class PlayerRigidFlexible : MonoBehaviour {
     private void SpawnParticle() {
         if (MovementParticles) {
             Instantiate(particle, transform.position, Quaternion.identity);
+        }
+    }
+
+    private void SpawnTransitionParticle() {
+        if (MovementParticles) {
+            Instantiate(TransitionParticle, transform.position, Quaternion.identity);
         }
     }
 

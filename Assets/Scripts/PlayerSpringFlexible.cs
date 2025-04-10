@@ -9,6 +9,7 @@ public class PlayerSpringFlexible : MonoBehaviour {
     // Particles
     public bool MovementParticles = false;
     public GameObject particle;
+    public GameObject TransitionParticle;
     public float ParticleInterval = 0.5f;
 
     // Tether
@@ -57,6 +58,7 @@ public class PlayerSpringFlexible : MonoBehaviour {
             Debug.Log(SphericalCoords);
             if (!FreeFalling) { CartesianVelocity = Utils.SphericalToCartesianVelocity(SphericalVelocity, SphericalCoords); }
             lineDrawer.SetAnchor(null);
+            SpawnTransitionParticle();
             Switching = true;
             FreeFalling = true;
             return;
@@ -112,6 +114,12 @@ public class PlayerSpringFlexible : MonoBehaviour {
     private void SpawnParticle() {
         if (MovementParticles) {
             Instantiate(particle, transform.position, Quaternion.identity);
+        }
+    }
+
+    private void SpawnTransitionParticle() {
+        if (MovementParticles) {
+            Instantiate(TransitionParticle, transform.position, Quaternion.identity);
         }
     }
 

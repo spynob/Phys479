@@ -9,6 +9,7 @@ public class PlayerSpringFreefall : MonoBehaviour {
     // Particles
     public bool MovementParticles = false;
     public GameObject particle;
+    public GameObject TransitionParticle;
     public float ParticleInterval = 0.5f;
 
     // Tether
@@ -92,7 +93,8 @@ public class PlayerSpringFreefall : MonoBehaviour {
 
     private void SpawnParticle() {
         if (MovementParticles) {
-            Instantiate(particle, transform.position, Quaternion.identity);
+            if (!Switching) { Instantiate(particle, transform.position, Quaternion.identity); }
+            else { Instantiate(TransitionParticle, transform.position, Quaternion.identity); }
         }
     }
 

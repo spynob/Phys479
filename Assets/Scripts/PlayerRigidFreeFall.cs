@@ -9,6 +9,7 @@ public class PlayerRigidFreeFall : MonoBehaviour {
     // Particles
     public bool MovementParticles = false;
     public GameObject particle;
+    public GameObject TransitionParticle;
     public float ParticleInterval = 0.5f;
 
     // Tether
@@ -32,6 +33,7 @@ public class PlayerRigidFreeFall : MonoBehaviour {
     private Vector2 SphericalAcc; // (omegaDot [thetaDotDot], alphaDot [phiDOtDot])
     private Vector3 CartesianVelocity; // (xDot, yDot, zDot)
     bool Switching = false;
+    bool FreeFalling = false;
 
     private void Awake() {
         GetInput = GetComponent<InputSubscription>();
@@ -52,19 +54,27 @@ public class PlayerRigidFreeFall : MonoBehaviour {
             Debug.Log("SWITCH");
             CartesianVelocity = Utils.SphericalToCartesianVelocity(SphericalVelocity, SphericalCoords, length);
             lineDrawer.SetAnchor(null);
+            SpawnTransitionParticle();
             Switching = true;
+            FreeFalling = true;
             return;
         }
         else if (!GetInput.Swing && Switching) {
             Switching = false;
+            SpawnTransitionParticle();
             SwitchAnchor();
+            length = Vector3.Distance(transform.position, Anchors[anchorIndex].transform.position);
+            return;
+        }
+        if (Vector3.Distance(transform.position, Anchors[anchorIndex].transform.position) > length && FreeFalling && !Switching) {
             Grapple();
             SphericalVelocity = Utils.CartesianToSphericalVelocity(CartesianVelocity, SphericalCoords, length, GameManager.Instance.epsilon);
+            FreeFalling = false;
         }
     }
 
     void FixedUpdate() {
-        if (!Switching) {
+        if (!FreeFalling) {
             float[] state = { SphericalCoords.x, SphericalVelocity.x, SphericalCoords.y, SphericalVelocity.y };
             state = RungeKutta.Step(Time.fixedDeltaTime, state, length);
             ParseState(state);
@@ -90,7 +100,14 @@ public class PlayerRigidFreeFall : MonoBehaviour {
 
     private void SpawnParticle() {
         if (MovementParticles) {
-            Instantiate(particle, transform.position, Quaternion.identity);
+            if (!FreeFalling) Instantiate(particle, transform.position, Quaternion.identity);
+            else Instantiate(TransitionParticle, transform.position, Quaternion.Euler(45, 0, 0));
+        }
+    }
+
+    private void SpawnTransitionParticle() {
+        if (MovementParticles) {
+            Instantiate(TransitionParticle, transform.position, Quaternion.Euler(45, 0, 0));
         }
     }
 

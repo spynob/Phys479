@@ -9,6 +9,7 @@ public class Player : MonoBehaviour {
     // Particles
     public bool MovementParticles = false;
     public GameObject particle;
+    public GameObject TransitionParticle;
     public float ParticleInterval = 0.5f;
 
     // Tether
@@ -89,6 +90,12 @@ public class Player : MonoBehaviour {
     private void SpawnParticle() {
         if (MovementParticles) {
             Instantiate(particle, transform.position, Quaternion.identity);
+        }
+    }
+
+    private void SpawnTransitionParticle() {
+        if (MovementParticles) {
+            Instantiate(TransitionParticle, transform.position, Quaternion.identity);
         }
     }
 
