@@ -85,7 +85,7 @@ public static class Utils {
         return new Vector3(Mathf.Acos(-relativeCoords.y / relativeCoords.magnitude), Mathf.Atan2(relativeCoords.z, relativeCoords.x), relativeCoords.magnitude);
     }
 
-    public static bool IsRadialMovementOutwardRigid(Vector2 sphericalCoords, Vector2 sphericalVelocity) {
-        return sphericalVelocity.x * sphericalVelocity.x + sphericalVelocity.y * sphericalVelocity.y * Mathf.Sin(sphericalCoords.x) * Mathf.Sin(sphericalCoords.x) + GameManager.Instance.gravity * Mathf.Cos(sphericalCoords.x) >= 0;
+    public static bool IsRadialMovementOutwardRigid(Vector2 sphericalCoords, Vector2 sphericalVelocity, float length) {
+        return length * sphericalVelocity.x * sphericalVelocity.x + length * Mathf.Sin(sphericalCoords.x) * sphericalVelocity.y * sphericalVelocity.y + GameManager.Instance.gravity * Mathf.Cos(sphericalCoords.x) > 0;
     }
 }

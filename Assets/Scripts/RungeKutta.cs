@@ -43,7 +43,7 @@ public static class RungeKutta {
         IF YOU ARE USING VARYING MASS, REMOVE THE CALL OF UpdateDamping(mass) IN Plyaer.cs AND DIVIDE EACH APPEARANCE OF damping IN THE FOLLOWING LINES BY THE APPROPRIATE TERM "damping/mass"
         */
         // theta
-        float omegaDot = Mathf.Sin(theta) * (Mathf.Cos(theta) * alpha * alpha - GameManager.Instance.gravity / length);
+        float omegaDot = Mathf.Sin(theta) * (Mathf.Cos(theta) * alpha * alpha - GameManager.Instance.gravity / length) - GameManager.Instance.damping * omega;
 
         // phi
         float dividant = Mathf.Tan(theta);

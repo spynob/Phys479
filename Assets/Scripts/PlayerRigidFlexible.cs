@@ -66,16 +66,18 @@ public class PlayerRigidFlexible : MonoBehaviour {
             SpawnTransitionParticle();
             SphericalVelocity = Utils.CartesianToSphericalVelocity(CartesianVelocity, SphericalCoords, length, GameManager.Instance.epsilon);
         }
-        if (!Utils.IsRadialMovementOutwardRigid(SphericalCoords, SphericalVelocity) && !FreeFalling && !Switching) {
+        if (!Utils.IsRadialMovementOutwardRigid(SphericalCoords, SphericalVelocity, Vector3.Distance(transform.position, Anchors[anchorIndex].transform.position)) && !FreeFalling && !Switching) {
             //SphericalCoords = Utils.RelativeCartesianToSphericalCoords(transform.position - Anchors[anchorIndex].transform.position);
             CartesianVelocity = Utils.SphericalToCartesianVelocity(SphericalVelocity, SphericalCoords, length);
             lineDrawer.SetToFreefall();
+            SpawnTransitionParticle();
             FreeFalling = true;
         }
         else if (Vector3.Distance(transform.position, Anchors[anchorIndex].transform.position) >= length + GameManager.Instance.epsilonLength && FreeFalling && !Switching) {
             SphericalCoords = Utils.RelativeCartesianToSphericalCoords(transform.position - Anchors[anchorIndex].transform.position);
             SphericalVelocity = Utils.CartesianToSphericalVelocity(CartesianVelocity, SphericalCoords, length, GameManager.Instance.epsilon);
             lineDrawer.SetToPendulum();
+            SpawnTransitionParticle();
             FreeFalling = false;
         }
     }

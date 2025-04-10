@@ -169,7 +169,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MovementParticles: 1
   particle: {fileID: 4154735860701002386, guid: ff1bb5148e2790a4e9962da00987abd1, type: 3}
+  TransitionParticle: {fileID: 5418434677783447187, guid: 319cc84effa2eba4eb28c1820d846ad1, type: 3}
   ParticleInterval: 0.2
   GetInput: {fileID: 0}
   mass: 10
-  IntialSphericalCoordinates: {x: 0, y: 0, z: 0}
+  InitialSphericalVelocity: {x: 0, y: 0, z: 0}
+  InitialStretch: 0
